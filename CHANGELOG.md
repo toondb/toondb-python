@@ -19,12 +19,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - This allows for independent versioning and faster CI/CD pipelines.
 
 ### Infrastructure
-- **New Release Workflow**: Now pulls pre-built binaries directly from main ToonDB releases.
+- **New Release Workflow**: Now pulls pre-built binaries directly from [toondb/toondb](https://github.com/toondb/toondb) releases.
+  - Supports Python 3.9 through 3.13
+  - Automatically creates GitHub releases with all wheel packages attached
+  - Each wheel bundles platform-specific binaries and FFI libraries
+  - See [RELEASE.md](RELEASE.md) for detailed release process documentation
 - **Trusted Publishing**: Configured PyPI Trusted Publisher (OIDC) security.
 - **Platform Bundles**: 
-  - Linux x86_64
+  - Linux x86_64 (manylinux_2_17)
   - macOS ARM64 (Apple Silicon)
   - Windows x64
+
+### Documentation
+- Added comprehensive [RELEASE.md](RELEASE.md) explaining how binaries are sourced from toondb/toondb
+- Updated README with binary source information
+- Enhanced release workflow with detailed summaries and status reporting
 
 ## [0.2.9] - 2026-01-02
 

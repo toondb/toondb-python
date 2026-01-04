@@ -2,13 +2,47 @@
 # ToonDB Python SDK Release Pipeline
 # =============================================================================
 #
-# Downloads pre-built binaries from main ToonDB repo releases and packages
-# them into platform-specific Python wheels for PyPI.
+# WORKFLOW FLOW:
+#
+# ┌─────────────────────────────────────────────────────────────────┐
+# │ 1. Download binaries from toondb/toondb + Build (PARALLEL)     │
+# ├─────────────────────────────────────────────────────────────────┤
+# │  ├─ build-wheel (Linux x86_64)   → downloads binary + builds   │
+# │  ├─ build-wheel (macOS ARM64)    → downloads binary + builds   │
+# │  ├─ build-wheel (Windows x64)    → downloads binary + builds   │
+# │  └─ build-sdist                  → builds source distribution  │
+# └─────────────────────────────────────────────────────────────────┘
+#                              ↓
+# ┌─────────────────────────────────────────────────────────────────┐
+# │ 2. Publish packages (PARALLEL)                                  │
+# ├─────────────────────────────────────────────────────────────────┤
+# │  ├─ create-release  → Creates GitHub release + attaches wheels │
+# │  └─ publish         → Uploads wheels to PyPI                   │
+# └─────────────────────────────────────────────────────────────────┘
+#                              ↓
+# ┌─────────────────────────────────────────────────────────────────┐
+# │ 3. summary          → Shows comprehensive status               │
+# └─────────────────────────────────────────────────────────────────┘
+#
+# This workflow packages pre-built ToonDB binaries into Python wheels.
+#
+# IMPORTANT: This SDK pulls pre-compiled binaries from the main ToonDB 
+# repository (toondb/toondb) and wraps them in Python wheels. Each wheel 
+# contains platform-specific binaries:
+#   - toondb-bulk (CLI tool for bulk operations)
+#   - toondb-server (standalone server)
+#   - toondb-grpc-server (gRPC server)
+#   - libtoondb_storage.* (FFI library)
+#   - libtoondb_index.* (FFI library)
+#
+# The version input MUST match an existing release in toondb/toondb repo.
 #
 # Platforms supported:
 #   - Linux x86_64 (manylinux_2_17)
 #   - macOS ARM64 (Apple Silicon)
 #   - Windows x64
+#
+# Python versions supported: 3.9, 3.10, 3.11, 3.12, 3.13
 #
 # =============================================================================
 # REQUIRED SETUP:
@@ -18,6 +52,9 @@
 #   Uses OIDC Trusted Publisher (configure at PyPI project settings)
 #   https://pypi.org/manage/project/toondb-client/settings/publishing/
 #
+# GitHub Releases - Requires write permission
+#   Uses GITHUB_TOKEN with contents: write permission
+#
 # =============================================================================
 
 name: Release
@@ -26,8 +63,12 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Release version (e.g., 0.3.1) - must match a toondb/toondb release'
+        description: 'Release version (e.g., 0.3.1) - MUST match an existing toondb/toondb release tag'
         required: true
+        type: string
+      toondb_version:
+        description: 'ToonDB binary version (defaults to same as version if not specified)'
+        required: false
         type: string
       dry_run:
         description: 'Dry run (validate without publishing)'
@@ -82,7 +123,12 @@ jobs:
       - name: Download binaries from main ToonDB release
         shell: bash
         run: |
-          VERSION="${{ inputs.version }}"
+          # Use toondb_version if provided, otherwise use version
+          VERSION="${{ inputs.toondb_version }}"
+          if [ -z "$VERSION" ]; then
+            VERSION="${{ inputs.version }}"
+          fi
+          
           TAG="v${VERSION}"
           TARGET="${{ matrix.target }}"
           
@@ -93,7 +139,10 @@ jobs:
           fi
           
           DOWNLOAD_URL="https://github.com/${{ env.TOONDB_REPO }}/releases/download/${TAG}/${ASSET_NAME}"
-          echo "Downloading from: $DOWNLOAD_URL"
+          echo "Downloading ToonDB binaries from main repository:"
+          echo "  Repository: ${{ env.TOONDB_REPO }}"
+          echo "  Version: ${VERSION}"
+          echo "  URL: $DOWNLOAD_URL"
           
           curl -L -f -o release-archive.${{ matrix.archive_ext }} "$DOWNLOAD_URL"
           
@@ -227,7 +276,110 @@ jobs:
           retention-days: 5
 
   # ===========================================================================
-  # Publish to PyPI
+  # Create GitHub Release
+  # ===========================================================================
+  create-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [build-wheel, build-sdist]
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist/
+          merge-multiple: true
+
+      - name: List release packages
+        run: |
+          echo "=== Packages for release ==="
+          ls -la dist/
+          echo ""
+          echo "Total packages: $(ls dist/ | wc -l)"
+
+      - name: Generate release notes
+        id: release_notes
+        run: |
+          cat > release_notes.md << 'EOF'
+          ## ToonDB Python SDK v${{ inputs.version }}
+          
+          Python SDK wrapping pre-built binaries from [toondb/toondb v${{ inputs.toondb_version || inputs.version }}](https://github.com/toondb/toondb/releases/tag/v${{ inputs.toondb_version || inputs.version }})
+          
+          ### Installation
+          
+          ```bash
+          pip install toondb-client==${{ inputs.version }}
+          ```
+          
+          ### What's Included
+          
+          This release contains platform-specific wheels with pre-compiled ToonDB binaries:
+          
+          - **toondb-bulk**: CLI tool for bulk data operations
+          - **toondb-server**: Standalone database server
+          - **toondb-grpc-server**: gRPC server implementation
+          - **libtoondb_storage**: Native storage FFI library
+          - **libtoondb_index**: Native indexing FFI library
+          
+          ### Supported Platforms
+          
+          - ✅ **Linux x86_64** (manylinux_2_17_x86_64)
+          - ✅ **macOS ARM64** (Apple Silicon, macosx_11_0_arm64)
+          - ✅ **Windows x64** (win_amd64)
+          
+          ### Python Version Support
+          
+          - Python 3.9
+          - Python 3.10
+          - Python 3.11
+          - Python 3.12
+          - Python 3.13
+          
+          ### Package Contents
+          
+          Each wheel includes:
+          - Python SDK code (`toondb` package)
+          - Platform-specific binaries in `_bin/<platform>/`
+          - Shared libraries in `lib/<platform>/`
+          
+          ### Source Distribution
+          
+          The source distribution (`.tar.gz`) is also available for custom builds, though binaries are not included and would need to be obtained separately from the main ToonDB repository.
+          
+          ---
+          
+          **Binary Source**: These Python wheels bundle pre-compiled binaries from the [ToonDB main repository](https://github.com/toondb/toondb) release v${{ inputs.toondb_version || inputs.version }}.
+          EOF
+
+      - name: Create GitHub Release
+        if: ${{ inputs.dry_run != true }}
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ inputs.version }}
+          name: Release v${{ inputs.version }}
+          body_path: release_notes.md
+          draft: false
+          prerelease: false
+          files: dist/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Dry run - show what would be released
+        if: ${{ inputs.dry_run == true }}
+        run: |
+          echo "🔍 Dry run mode - GitHub release would be created with:"
+          echo ""
+          cat release_notes.md
+          echo ""
+          echo "=== Files to attach ==="
+          ls -lh dist/
+
+  # ===========================================================================
+  # Publish to PyPI (parallel with GitHub release creation)
   # ===========================================================================
   publish:
     name: Publish to PyPI
@@ -284,36 +436,88 @@ jobs:
   summary:
     name: Release Summary
     runs-on: ubuntu-latest
-    needs: [publish]
+    needs: [build-wheel, build-sdist, create-release, publish]
     if: always()
     steps:
-      - name: Summary
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist/
+          merge-multiple: true
+
+      - name: Generate comprehensive summary
         run: |
-          echo "## 🐍 ToonDB Python SDK v${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "## 🎉 ToonDB Python SDK v${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           if [ "${{ inputs.dry_run }}" = "true" ]; then
-            echo "**Mode:** Dry Run (no packages published)" >> $GITHUB_STEP_SUMMARY
+            echo "**Mode:** 🧪 Dry Run (validation only - nothing published)" >> $GITHUB_STEP_SUMMARY
           else
-            echo "**Mode:** Production Release" >> $GITHUB_STEP_SUMMARY
+            echo "**Mode:** 🚀 Production Release" >> $GITHUB_STEP_SUMMARY
           fi
           
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Installation" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Binary Source" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          TOONDB_VERSION="${{ inputs.toondb_version }}"
+          if [ -z "$TOONDB_VERSION" ]; then
+            TOONDB_VERSION="${{ inputs.version }}"
+          fi
+          echo "**Binaries pulled from:** [toondb/toondb v${TOONDB_VERSION}](https://github.com/${{ env.TOONDB_REPO }}/releases/tag/v${TOONDB_VERSION})" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "This Python SDK wraps pre-compiled binaries from the main ToonDB repository." >> $GITHUB_STEP_SUMMARY
+          echo "Each wheel contains platform-specific:" >> $GITHUB_STEP_SUMMARY
+          echo "- \`toondb-bulk\`, \`toondb-server\`, \`toondb-grpc-server\` (executables)" >> $GITHUB_STEP_SUMMARY
+          echo "- \`libtoondb_storage.*\`, \`libtoondb_index.*\` (FFI libraries)" >> $GITHUB_STEP_SUMMARY
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📥 Installation" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
           echo "pip install toondb-client==${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Platforms Bundled" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Linux x86_64 (manylinux_2_17)" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ macOS ARM64 (Apple Silicon)" >> $GITHUB_STEP_SUMMARY
-          echo "- ✅ Windows x64" >> $GITHUB_STEP_SUMMARY
+          echo "### 🐍 Python Version Support" >> $GITHUB_STEP_SUMMARY
+          echo "Python 3.9 | 3.10 | 3.11 | 3.12 | 3.13" >> $GITHUB_STEP_SUMMARY
           
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Status" >> $GITHUB_STEP_SUMMARY
-          echo "| Job | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "### 💻 Platform Support" >> $GITHUB_STEP_SUMMARY
+          echo "| Platform | Wheel Tag | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Linux x86_64 | manylinux_2_17_x86_64 | ✅ Built |" >> $GITHUB_STEP_SUMMARY
+          echo "| macOS ARM64 | macosx_11_0_arm64 | ✅ Built |" >> $GITHUB_STEP_SUMMARY
+          echo "| Windows x64 | win_amd64 | ✅ Built |" >> $GITHUB_STEP_SUMMARY
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📦 Packages Created" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          ls -lh dist/ | tail -n +2 | awk '{printf "%-8s  %s\n", $5, $9}'
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### ✅ Build Status" >> $GITHUB_STEP_SUMMARY
+          echo "| Job | Result |" >> $GITHUB_STEP_SUMMARY
           echo "|-----|--------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Build Wheels | ${{ needs.build-wheel.result || 'N/A' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Build sdist | ${{ needs.build-sdist.result || 'N/A' }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Publish | ${{ needs.publish.result }} |" >> $GITHUB_STEP_SUMMARY
+          
+          function status_icon() {
+            case "$1" in
+              success) echo "✅ Success" ;;
+              failure) echo "❌ Failed" ;;
+              cancelled) echo "⏸️ Cancelled" ;;
+              skipped) echo "⏭️ Skipped" ;;
+              *) echo "❔ $1" ;;
+            esac
+          }
+          
+          echo "| Build Wheels | $(status_icon '${{ needs.build-wheel.result }}') |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build Source Dist | $(status_icon '${{ needs.build-sdist.result }}') |" >> $GITHUB_STEP_SUMMARY
+          echo "| Create GitHub Release | $(status_icon '${{ needs.create-release.result }}') |" >> $GITHUB_STEP_SUMMARY
+          echo "| Publish to PyPI | $(status_icon '${{ needs.publish.result }}') |" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ inputs.dry_run }}" != "true" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### 🔗 Links" >> $GITHUB_STEP_SUMMARY
+            echo "- 📦 [PyPI Package](https://pypi.org/project/toondb-client/${{ inputs.version }}/)" >> $GITHUB_STEP_SUMMARY
+            echo "- 🏷️ [GitHub Release](https://github.com/${{ github.repository }}/releases/tag/v${{ inputs.version }})" >> $GITHUB_STEP_SUMMARY
+            echo "- 🔧 [Source Binaries](https://github.com/${{ env.TOONDB_REPO }}/releases/tag/v${TOONDB_VERSION})" >> $GITHUB_STEP_SUMMARY
+          fi

@@ -41,6 +41,8 @@ pip install toondb-client
 
 **No Rust toolchain required!**
 
+> ℹ️ **About the Binaries**: This Python SDK packages pre-compiled binaries from the [main ToonDB repository](https://github.com/toondb/toondb). Each wheel contains platform-specific executables (`toondb-bulk`, `toondb-server`, `toondb-grpc-server`) and native FFI libraries. See [RELEASE.md](RELEASE.md) for details on the release process.
+
 ## What's New in Latest Release
 
 ### 🎯 Namespace Isolation

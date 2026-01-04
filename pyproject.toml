@@ -53,9 +53,9 @@ all = [
 
 [project.urls]
 Homepage = "https://toondb.dev"
-Repository = "https://github.com/toondb/toondb"
+Repository = "https://github.com/toondb/toondb-python-sdk"
 Documentation = "https://docs.toondb.dev"
-"Bug Tracker" = "https://github.com/toondb/toondb/issues"
+"Bug Tracker" = "https://github.com/toondb/toondb-python-sdk/issues"
 
 [project.scripts]
 # CLI tools accessible from anywhere after pip install
