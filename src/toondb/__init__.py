@@ -142,7 +142,7 @@ except ImportError:
     track_batch_insert = None
     is_analytics_disabled = lambda: True
 
-__version__ = "0.3.1"
+__version__ = "0.3.3"
 
 
 # =============================================================================
