@@ -1566,10 +1566,11 @@ class Database:
             >>> print(f"Keys: {stats.get('keys_count', 'N/A')}")
             >>> print(f"Bytes written: {stats.get('bytes_written', 0)}")
         """
-        # TODO: Add FFI binding for stats
-        # For now, return placeholder that won't crash
+        # Note: Accurate key count would require FFI binding to storage engine stats
+        # For now, return placeholder values that won't crash
+        # (scan_prefix requires 2+ byte prefix, so empty prefix scan won't work)
         return {
-            "keys_count": 0,
+            "keys_count": -1,  # -1 indicates "unknown" - would need FFI for real count
             "bytes_written": 0,
             "bytes_read": 0,
             "transactions_committed": 0,
@@ -1601,9 +1602,19 @@ class Database:
                 db.put(record.key, record.value)
             db.checkpoint()  # Ensure all data is durable
         """
-        # TODO: Add FFI binding for checkpoint
-        # For now, this is a no-op as data is auto-flushed
-        pass
+        # Call FFI checkpoint if available
+        # Note: _lib and _ptr may not exist in all connection modes
+        lib = getattr(self, '_lib', None)
+        ptr = getattr(self, '_ptr', None)
+        if lib is not None and ptr is not None:
+            try:
+                checkpoint_fn = getattr(lib, 'toondb_checkpoint', None)
+                if checkpoint_fn:
+                    checkpoint_fn(ptr)
+            except Exception:
+                # Non-fatal: checkpoint may not be supported
+                pass
+        # In modes without FFI, data is auto-flushed on transaction commit
     
     def _check_open(self) -> None:
         """Check that database is open."""

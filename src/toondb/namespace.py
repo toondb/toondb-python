@@ -893,11 +893,19 @@ class Namespace:
                 **kwargs,
             )
         
-        # Check if exists
+        # Check if exists in memory
         if config.name in self._collections:
             raise CollectionExistsError(config.name, self._name)
         
-        # TODO: Create via storage layer
+        # Check if exists in storage
+        config_key = f"{self._name}/_collections/{config.name}".encode()
+        if self._db.get(config_key) is not None:
+            raise CollectionExistsError(config.name, self._name)
+        
+        # Persist config to storage
+        self._db.put(config_key, json.dumps(config.to_dict()).encode())
+        
+        # Create and cache collection handle
         collection = Collection(self, config)
         self._collections[config.name] = collection
         
@@ -919,7 +927,15 @@ class Namespace:
         if name in self._collections:
             return self._collections[name]
         
-        # TODO: Load from storage
+        # Try loading from storage
+        config_key = f"{self._name}/_collections/{name}".encode()
+        data = self._db.get(config_key)
+        if data is not None:
+            config = CollectionConfig.from_dict(json.loads(data.decode()))
+            collection = Collection(self, config)
+            self._collections[name] = collection
+            return collection
+        
         raise CollectionNotFoundError(name, self._name)
     
     def collection(self, name: str) -> Collection:
@@ -928,16 +944,37 @@ class Namespace:
     
     def list_collections(self) -> List[str]:
         """List all collections in this namespace."""
-        # TODO: Load from storage
-        return list(self._collections.keys())
+        # Scan storage for all collection configs
+        prefix = f"{self._name}/_collections/".encode()
+        names = set(self._collections.keys())  # Start with cached
+        
+        with self._db.transaction() as txn:
+            for key, _ in txn.scan_prefix(prefix):
+                name = key.decode().split("/")[-1]
+                names.add(name)
+        
+        return sorted(names)
     
     def delete_collection(self, name: str) -> bool:
-        """Delete a collection."""
-        if name not in self._collections:
+        """Delete a collection and all its data."""
+        # Check if exists (load from storage if needed)
+        config_key = f"{self._name}/_collections/{name}".encode()
+        if name not in self._collections and self._db.get(config_key) is None:
             raise CollectionNotFoundError(name, self._name)
         
-        del self._collections[name]
-        # TODO: Delete from storage
+        # Remove from cache
+        if name in self._collections:
+            del self._collections[name]
+        
+        # Delete config from storage
+        self._db.delete(config_key)
+        
+        # Delete all vectors in collection
+        vectors_prefix = f"{self._name}/collections/{name}/vectors/".encode()
+        with self._db.transaction() as txn:
+            for key, _ in txn.scan_prefix(vectors_prefix):
+                txn.delete(key)
+        
         return True
     
     # ========================================================================
