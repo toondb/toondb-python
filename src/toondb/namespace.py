@@ -594,6 +594,8 @@ class Collection:
             
             if query_norm > 0 and doc_norm > 0:
                 similarity = dot_product / (query_norm * doc_norm)
+                # Normalize from [-1, 1] to [0, 1] for threshold comparisons
+                similarity = (similarity + 1.0) / 2.0
             else:
                 similarity = 0.0
             

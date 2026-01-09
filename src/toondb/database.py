@@ -2283,6 +2283,8 @@ class Database:
                         
                         if query_norm > 0 and cached_norm > 0:
                             score = dot_product / (query_norm * cached_norm)
+                            # Normalize from [-1, 1] to [0, 1] for threshold comparisons
+                            score = (score + 1.0) / 2.0
                         else:
                             score = 0.0
                         
