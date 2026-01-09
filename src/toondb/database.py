@@ -23,7 +23,7 @@ import os
 import sys
 import ctypes
 import warnings
-from typing import Optional, Dict, List, Union
+from typing import Optional, Dict, List, Union, Tuple
 from contextlib import contextmanager
 from .errors import (
     DatabaseError, 
@@ -325,39 +325,42 @@ class _FFI:
         lib.toondb_get_table_index_policy.restype = ctypes.c_uint8
         
         # Temporal Graph API
-        # Define C_TemporalEdge structure first
-        class C_TemporalEdge(ctypes.Structure):
-            _fields_ = [
-                ("from_id", ctypes.c_char_p),
-                ("edge_type", ctypes.c_char_p),
-                ("to_id", ctypes.c_char_p),
-                ("valid_from", ctypes.c_uint64),
-                ("valid_until", ctypes.c_uint64),
-                ("properties_json", ctypes.c_char_p),
-            ]
+        # NOTE: These FFI bindings are not yet available in the native library
+        # They are defined here for future compatibility but will cause dlsym errors if used
+        # Commenting out until the native library exports these symbols
         
-        # toondb_add_temporal_edge(ptr, namespace, edge) -> c_int
-        lib.toondb_add_temporal_edge.argtypes = [
-            ctypes.c_void_p,  # ptr
-            ctypes.c_char_p,  # namespace
-            C_TemporalEdge    # edge struct by value
-        ]
-        lib.toondb_add_temporal_edge.restype = ctypes.c_int
+        # class C_TemporalEdge(ctypes.Structure):
+        #     _fields_ = [
+        #         ("from_id", ctypes.c_char_p),
+        #         ("edge_type", ctypes.c_char_p),
+        #         ("to_id", ctypes.c_char_p),
+        #         ("valid_from", ctypes.c_uint64),
+        #         ("valid_until", ctypes.c_uint64),
+        #         ("properties_json", ctypes.c_char_p),
+        #     ]
         
-        # toondb_query_temporal_graph(ptr, namespace, node_id, mode, timestamp, edge_type) -> *c_char
-        lib.toondb_query_temporal_graph.argtypes = [
-            ctypes.c_void_p,  # ptr
-            ctypes.c_char_p,  # namespace
-            ctypes.c_char_p,  # node_id
-            ctypes.c_int,     # mode (0=CURRENT, 1=POINT_IN_TIME, 2=RANGE)
-            ctypes.c_uint64,  # timestamp
-            ctypes.c_char_p   # edge_type (optional, can be NULL)
-        ]
-        lib.toondb_query_temporal_graph.restype = ctypes.c_char_p
+        # # toondb_add_temporal_edge(ptr, namespace, edge) -> c_int
+        # lib.toondb_add_temporal_edge.argtypes = [
+        #     ctypes.c_void_p,  # ptr
+        #     ctypes.c_char_p,  # namespace
+        #     C_TemporalEdge    # edge struct by value
+        # ]
+        # lib.toondb_add_temporal_edge.restype = ctypes.c_int
         
-        # toondb_free_string(ptr) - Free strings returned by query_temporal_graph
-        lib.toondb_free_string.argtypes = [ctypes.c_char_p]
-        lib.toondb_free_string.restype = None
+        # # toondb_query_temporal_graph(ptr, namespace, node_id, mode, timestamp, edge_type) -> *c_char
+        # lib.toondb_query_temporal_graph.argtypes = [
+        #     ctypes.c_void_p,  # ptr
+        #     ctypes.c_char_p,  # namespace
+        #     ctypes.c_char_p,  # node_id
+        #     ctypes.c_int,     # mode (0=CURRENT, 1=POINT_IN_TIME, 2=RANGE)
+        #     ctypes.c_uint64,  # timestamp
+        #     ctypes.c_char_p   # edge_type (optional, can be NULL)
+        # ]
+        # lib.toondb_query_temporal_graph.restype = ctypes.c_char_p
+        
+        # # toondb_free_string(ptr) - Free strings returned by query_temporal_graph
+        # lib.toondb_free_string.argtypes = [ctypes.c_char_p]
+        # lib.toondb_free_string.restype = None
 
 
 class Transaction:
