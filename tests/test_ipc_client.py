@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for ToonDB IPC Client."""
+"""Tests for SochDB IPC Client."""
 
 import pytest
 import socket
@@ -21,8 +21,8 @@ import threading
 import time
 from typing import List, Tuple
 
-from toondb.ipc_client import IpcClient, Message, OpCode
-from toondb.errors import ConnectionError, DatabaseError
+from sochdb.ipc_client import IpcClient, Message, OpCode
+from sochdb.errors import ConnectionError, DatabaseError
 
 
 class MockServer:
@@ -145,7 +145,7 @@ def mock_server(tmp_path):
     # Use /tmp to avoid path length issues with AF_UNIX
     import tempfile
     import uuid
-    socket_path = f"/tmp/toondb_test_{uuid.uuid4().hex[:8]}.sock"
+    socket_path = f"/tmp/sochdb_test_{uuid.uuid4().hex[:8]}.sock"
     server = MockServer(socket_path)
     server.start()
     yield server, socket_path

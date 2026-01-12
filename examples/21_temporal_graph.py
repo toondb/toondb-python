@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """
-ToonDB Python SDK - Example: Temporal Graph Operations (PREVIEW)
+SochDB Python SDK - Example: Temporal Graph Operations (PREVIEW)
 
-NOTE: This feature requires ToonDB Server 0.3.5+
+NOTE: This feature requires SochDB Server 0.3.5+
 The temporal graph RPC methods are defined in proto but may not be 
 fully implemented in earlier server versions.
 
@@ -10,20 +10,20 @@ Temporal graphs allow you to query "What did the system know at time T?"
 This is essential for agent memory systems that need to reason about
 state changes over time.
 
-Requires: ToonDB gRPC server running on localhost:50051
-Start with: cargo run -p toondb-grpc --release
+Requires: SochDB gRPC server running on localhost:50051
+Start with: cargo run -p sochdb-grpc --release
 """
 
 import time
-from toondb import ToonDBClient
+from sochdb import SochDBClient
 
 def main():
     print("=" * 60)
-    print("ToonDB - Temporal Graph Example")
+    print("SochDB - Temporal Graph Example")
     print("=" * 60)
     
     # Connect to server
-    client = ToonDBClient("localhost:50051")
+    client = SochDBClient("localhost:50051")
     namespace = "smart_home"
     
     # Current time in milliseconds

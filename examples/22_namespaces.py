@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ToonDB Python SDK - Example: Multi-Tenant Namespaces (Embedded FFI)
+SochDB Python SDK - Example: Multi-Tenant Namespaces (Embedded FFI)
 
 Namespaces provide data isolation between tenants, applications,
 or environments in a single database instance.
@@ -10,11 +10,11 @@ No server required - uses embedded FFI.
 
 import json
 import shutil
-from toondb import Database
+from sochdb import Database
 
 def main():
     print("=" * 60)
-    print("ToonDB - Multi-Tenant Namespace Example (Embedded FFI)")
+    print("SochDB - Multi-Tenant Namespace Example (Embedded FFI)")
     print("=" * 60)
     print("Note: This uses embedded Database - no server required!\n")
     

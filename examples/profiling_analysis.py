@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-End-to-End Profiling Analysis for ToonDB Insert Performance
+End-to-End Profiling Analysis for SochDB Insert Performance
 
 This tool identifies specific bottlenecks in the insertion path by:
 1. Comparing Rust-native vs Python FFI performance
@@ -22,7 +22,7 @@ def run_rust_benchmark():
     try:
         result = subprocess.run(
             ["cargo", "run", "-p", "benchmarks", "--release", "--bin", "insert-profile"],
-            cwd="/Users/sushanth/toondb",
+            cwd="/Users/sushanth/sochdb",
             capture_output=True,
             text=True,
             timeout=30
@@ -74,7 +74,7 @@ def analyze_config_differences():
             "batch_processing": "Optimized_C++",
             "concurrency": "High"
         },
-        "ToonDB_Current": {
+        "SochDB_Current": {
             "max_connections": 16,
             "max_connections_layer0": 32,
             "ef_construction": 100,  # Higher = slower inserts
@@ -83,7 +83,7 @@ def analyze_config_differences():
             "batch_processing": "Rust_with_safety_checks",
             "concurrency": "RwLock_per_layer"
         },
-        "ToonDB_Optimized": {
+        "SochDB_Optimized": {
             "max_connections": 16,
             "max_connections_layer0": 32,
             "ef_construction": 48,  # Reduced for speed
@@ -101,8 +101,8 @@ def analyze_config_differences():
             print(f"  {key}: {value}")
     
     print("\n🔍 Key Differences:")
-    print("1. ef_construction: ChromaDB ~64 vs ToonDB 100 (56% higher)")
-    print("2. Quantization overhead: ToonDB has normalization costs")  
+    print("1. ef_construction: ChromaDB ~64 vs SochDB 100 (56% higher)")
+    print("2. Quantization overhead: SochDB has normalization costs")  
     print("3. Safety checks: Rust bounds checking vs C++ unchecked")
     print("4. Lock granularity: Per-layer locks vs bulk operations")
     
@@ -243,7 +243,7 @@ def recommend_optimizations():
     chromadb_throughput = 13570
     gap_factor = chromadb_throughput / current_throughput
     
-    print(f"Current ToonDB: {current_throughput:,} vec/s")
+    print(f"Current SochDB: {current_throughput:,} vec/s")
     print(f"Target ChromaDB: {chromadb_throughput:,} vec/s") 
     print(f"Gap: {gap_factor:.1f}x")
     print(f"\nOptimization pathway:")
@@ -261,7 +261,7 @@ def recommend_optimizations():
 
 def main():
     print("=" * 60)
-    print("  ToonDB Insert Performance Profiling Analysis")  
+    print("  SochDB Insert Performance Profiling Analysis")  
     print("=" * 60)
     
     # Run Rust benchmark for baseline

@@ -16,7 +16,7 @@ import time
 import os
 import shutil
 import ctypes
-from toondb.database import Database
+from sochdb.database import Database
 
 def benchmark_ffi():
     DB_PATH = "./bench_ffi_db"
@@ -35,7 +35,7 @@ def benchmark_ffi():
     # JSON-like value similar to Rust benchmark
     values = [f'{{"id":{i},"name":"User {i}","email":"user{i}@example.com","score":{i % 100}}}'.encode('utf-8') for i in range(N)]
     
-    print("\n--- ToonDB FFI Benchmark ---")
+    print("\n--- SochDB FFI Benchmark ---")
     
     # Insert Benchmark
     start_time = time.perf_counter()
@@ -85,7 +85,7 @@ def benchmark_ffi():
     start_time = time.perf_counter()
     
     # Use executemany for fair comparison (batch insert)
-    # But ToonDB benchmark used a loop in a transaction, so let's match that exactly
+    # But SochDB benchmark used a loop in a transaction, so let's match that exactly
     # to measure Python overhead + DB overhead per op
     with conn:
         for i in range(N):
@@ -114,7 +114,7 @@ def benchmark_ffi():
         os.remove(SQLITE_DB_PATH)
         
     # Comparison
-    print("\n--- Comparison (ToonDB vs SQLite) ---")
+    print("\n--- Comparison (SochDB vs SQLite) ---")
     print(f"Insert Speedup: {sqlite_insert_duration / insert_duration:.2f}x")
     print(f"Scan Speedup:   {sqlite_scan_duration / scan_duration:.2f}x")
 

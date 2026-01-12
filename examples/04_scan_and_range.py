@@ -20,8 +20,8 @@ import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from toondb import Database
-from toondb.errors import DatabaseError
+from sochdb import Database
+from sochdb.errors import DatabaseError
 
 DB_PATH = "./example_04_db"
 
@@ -275,7 +275,7 @@ def example_cleanup_with_scan():
 def main():
     """Run all examples."""
     print("\n" + "=" * 60)
-    print("ToonDB Python SDK - Example 04: Scan and Range Queries")
+    print("SochDB Python SDK - Example 04: Scan and Range Queries")
     print("=" * 60)
     
     cleanup()

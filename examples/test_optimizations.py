@@ -8,14 +8,14 @@ import tempfile
 import os
 
 def measure_insertion_performance():
-    """Measure ToonDB vector insertion performance"""
+    """Measure SochDB vector insertion performance"""
     
     # Create a simple test script to measure insertion speed
     test_script = """
 use std::time::Instant;
-use toondb_index::hnsw::HnswIndex;
-use toondb_index::vector_quantized::{QuantizedVector, Precision};
-use toondb_index::distance::DistanceMetric;
+use sochdb_index::hnsw::HnswIndex;
+use sochdb_index::vector_quantized::{QuantizedVector, Precision};
+use sochdb_index::distance::DistanceMetric;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let dimension = 768;
@@ -80,16 +80,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     
     try:
         # Write to the src/bin directory
-        bin_path = "/Users/sushanth/toondb/toondb-index/src/bin/test_perf.rs"
+        bin_path = "/Users/sushanth/sochdb/sochdb-index/src/bin/test_perf.rs"
         with open(bin_path, 'w') as f:
             f.write(test_script)
         
-        print("🚀 Running ToonDB HNSW insertion performance test...")
+        print("🚀 Running SochDB HNSW insertion performance test...")
         
         # Run the test
         result = subprocess.run([
             'cargo', 'run', '--release', '--bin', 'test_perf'
-        ], capture_output=True, text=True, cwd='/Users/sushanth/toondb/toondb-index')
+        ], capture_output=True, text=True, cwd='/Users/sushanth/sochdb/sochdb-index')
         
         if result.returncode == 0:
             print("✅ Test completed successfully!")

@@ -20,8 +20,8 @@ import time
 import pytest
 from typing import List, Dict, Any
 from faker import Faker
-from toondb import IpcClient, Query, ToonDBError
-from toondb.ipc_client import OpCode, Message
+from sochdb import IpcClient, Query, SochDBError
+from sochdb.ipc_client import OpCode, Message
 
 # Mock Server that supports new opcodes
 class AdvancedMockServer:
@@ -137,7 +137,7 @@ class AdvancedMockServer:
 
 @pytest.fixture
 def mock_server():
-    socket_path = "/tmp/toondb_test.sock"
+    socket_path = "/tmp/sochdb_test.sock"
     server = AdvancedMockServer(socket_path)
     server.start()
     yield server

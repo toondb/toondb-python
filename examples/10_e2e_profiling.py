@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ToonDB End-to-End Profiling: 1K Vector Insertion into HNSW
+SochDB End-to-End Profiling: 1K Vector Insertion into HNSW
 
 This script provides detailed profiling of the complete data path:
   Python SDK → FFI → Rust → HNSW Index
@@ -12,8 +12,8 @@ Usage:
     # With memory profiling (requires tracemalloc)
     python 10_e2e_profiling.py --memory
 
-    # With Rust-side tracing (requires TOONDB_PROFILING=1)
-    TOONDB_PROFILING=1 python 10_e2e_profiling.py --detailed
+    # With Rust-side tracing (requires SOCHDB_PROFILING=1)
+    SOCHDB_PROFILING=1 python 10_e2e_profiling.py --detailed
 
 Outputs:
     - Console summary with timing breakdown
@@ -38,10 +38,10 @@ import numpy as np
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 try:
-    from toondb.vector import VectorIndex, _FFI, dump_profiling, enable_profiling
+    from sochdb.vector import VectorIndex, _FFI, dump_profiling, enable_profiling
 except ImportError as e:
-    print(f"Error importing toondb: {e}")
-    print("Make sure to build the Rust library first: cargo build --release -p toondb-index")
+    print(f"Error importing sochdb: {e}")
+    print("Make sure to build the Rust library first: cargo build --release -p sochdb-index")
     sys.exit(1)
 
 
@@ -447,8 +447,8 @@ def run_batch_profiling(
             "batch_size": batch_size or num_vectors,
             "ef_construction": ef_construction,
             "max_connections": max_connections,
-            "safe_mode": os.environ.get("TOONDB_BATCH_SAFE_MODE", "0"),
-            "profiling_enabled": os.environ.get("TOONDB_PROFILING", "0"),
+            "safe_mode": os.environ.get("SOCHDB_BATCH_SAFE_MODE", "0"),
+            "profiling_enabled": os.environ.get("SOCHDB_PROFILING", "0"),
         }
     )
     
@@ -456,7 +456,7 @@ def run_batch_profiling(
     tracemalloc.start()
     
     print(f"\n{'='*70}")
-    print(f"ToonDB HNSW End-to-End Profiling")
+    print(f"SochDB HNSW End-to-End Profiling")
     print(f"{'='*70}")
     print(f"Configuration:")
     print(f"  Vectors:        {num_vectors:,}")
@@ -680,7 +680,7 @@ def save_profile(profile: E2EProfile, filename: str = "profiling_results.json"):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="ToonDB HNSW End-to-End Profiling")
+    parser = argparse.ArgumentParser(description="SochDB HNSW End-to-End Profiling")
     parser.add_argument("--vectors", type=int, default=1000, help="Number of vectors to insert")
     parser.add_argument("--dimension", type=int, default=768, help="Vector dimension")
     parser.add_argument("--batch-size", type=int, default=None, help="Batch size (default: all at once)")
@@ -717,7 +717,7 @@ def main():
     save_profile(profile, args.output)
     
     # Dump Rust-side profiling if enabled
-    if os.environ.get("TOONDB_PROFILING") == "1":
+    if os.environ.get("SOCHDB_PROFILING") == "1":
         print("\nDumping Rust-side profiling data...")
         dump_profiling()
     

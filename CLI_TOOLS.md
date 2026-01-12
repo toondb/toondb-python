@@ -1,18 +1,18 @@
-# ToonDB CLI Tools
+# SochDB CLI Tools
 
-> **v0.2.9** - Production-grade Python wrappers for ToonDB command-line tools
+> **v0.2.9** - Production-grade Python wrappers for SochDB command-line tools
 
-After `pip install toondb-client`, three CLI commands are globally available:
+After `pip install sochdb-client`, three CLI commands are globally available:
 
 ```bash
-toondb-server      # IPC server for multi-process access
-toondb-bulk        # High-performance vector operations
-toondb-grpc-server # gRPC server for remote vector search
+sochdb-server      # IPC server for multi-process access
+sochdb-bulk        # High-performance vector operations
+sochdb-grpc-server # gRPC server for remote vector search
 ```
 
 ---
 
-## toondb-server
+## sochdb-server
 
 Multi-process database access via Unix domain sockets.
 
@@ -20,13 +20,13 @@ Multi-process database access via Unix domain sockets.
 
 ```bash
 # Start server
-toondb-server --db ./my_database
+sochdb-server --db ./my_database
 
 # Check status
-toondb-server status --db ./my_database
+sochdb-server status --db ./my_database
 
 # Stop server
-toondb-server stop --db ./my_database
+sochdb-server stop --db ./my_database
 ```
 
 ### Features
@@ -43,15 +43,15 @@ toondb-server stop --db ./my_database
 ### Options
 
 ```
-Usage: toondb-server [OPTIONS] [COMMAND]
+Usage: sochdb-server [OPTIONS] [COMMAND]
 
 Commands:
   stop     Stop a running server
   status   Check server status
 
 Options:
-  -d, --db PATH           Database directory [default: ./toondb_data]
-  -s, --socket PATH       Unix socket path [default: <db>/toondb.sock]
+  -d, --db PATH           Database directory [default: ./sochdb_data]
+  -s, --socket PATH       Unix socket path [default: <db>/sochdb.sock]
       --max-clients N     Maximum connections [default: 100]
       --timeout-ms MS     Connection timeout [default: 30000]
       --log-level LEVEL   trace/debug/info/warn/error [default: info]
@@ -63,60 +63,60 @@ Options:
 
 ```bash
 # Development
-toondb-server --db ./dev_db --log-level debug
+sochdb-server --db ./dev_db --log-level debug
 
 # Production
-toondb-server \
-    --db /var/lib/toondb/production \
-    --socket /var/run/toondb.sock \
+sochdb-server \
+    --db /var/lib/sochdb/production \
+    --socket /var/run/sochdb.sock \
     --max-clients 500 \
     --timeout-ms 60000 \
     --log-level info
 
 # Check if running
-toondb-server status --db ./my_database
+sochdb-server status --db ./my_database
 # Output: [Server] Running (PID: 12345)
 
 # Graceful stop
-toondb-server stop --db ./my_database
+sochdb-server stop --db ./my_database
 ```
 
 ### Environment Variables
 
 | Variable | Description |
 |----------|-------------|
-| `TOONDB_SERVER_PATH` | Override bundled binary path |
+| `SOCHDB_SERVER_PATH` | Override bundled binary path |
 
 ### Error Handling
 
 ```bash
 # Socket already in use
-$ toondb-server --db ./my_db
-[Server] Error: Socket already in use (PID: 12345): ./my_db/toondb.sock
-         Another toondb-server instance may be running.
-         Use 'toondb-server stop --socket ./my_db/toondb.sock' to stop it.
+$ sochdb-server --db ./my_db
+[Server] Error: Socket already in use (PID: 12345): ./my_db/sochdb.sock
+         Another sochdb-server instance may be running.
+         Use 'sochdb-server stop --socket ./my_db/sochdb.sock' to stop it.
 
 # Permission denied
-$ toondb-server --db /root/db
+$ sochdb-server --db /root/db
 [Server] Error: Database directory is not writable: /root/db
 
 # Binary not found
-$ toondb-server --db ./my_db
-[Server] Error: toondb-server binary not found.
+$ sochdb-server --db ./my_db
+[Server] Error: sochdb-server binary not found.
 Searched:
-  - TOONDB_SERVER_PATH environment variable
+  - SOCHDB_SERVER_PATH environment variable
   - Bundled in package (_bin/)
   - System PATH
 
 To fix:
-  1. Reinstall: pip install --force-reinstall toondb-client
-  2. Or build: cargo build --release -p toondb-server
-  3. Or set: export TOONDB_SERVER_PATH=/path/to/toondb-server
+  1. Reinstall: pip install --force-reinstall sochdb-client
+  2. Or build: cargo build --release -p sochdb-server
+  3. Or set: export SOCHDB_SERVER_PATH=/path/to/sochdb-server
 ```
 
 ---
 
-## toondb-bulk
+## sochdb-bulk
 
 High-performance vector index building and querying.
 
@@ -124,19 +124,19 @@ High-performance vector index building and querying.
 
 ```bash
 # Build HNSW index
-toondb-bulk build-index \
+sochdb-bulk build-index \
     --input embeddings.npy \
     --output index.hnsw \
     --dimension 768
 
 # Query index
-toondb-bulk query \
+sochdb-bulk query \
     --index index.hnsw \
     --query query.raw \
     --k 10
 
 # Get index info
-toondb-bulk info --index index.hnsw
+sochdb-bulk info --index index.hnsw
 ```
 
 ### Features
@@ -155,7 +155,7 @@ toondb-bulk info --index index.hnsw
 Build an HNSW vector index from embeddings.
 
 ```bash
-toondb-bulk build-index \
+sochdb-bulk build-index \
     --input vectors.npy \        # .npy or .raw format
     --output index.hnsw \        # Output index path
     --dimension 768 \            # Vector dimension
@@ -172,7 +172,7 @@ toondb-bulk build-index \
 Query an HNSW index for nearest neighbors.
 
 ```bash
-toondb-bulk query \
+sochdb-bulk query \
     --index index.hnsw \     # Index file
     --query query.raw \      # Query vector (.raw or .npy)
     --k 10 \                 # Number of neighbors
@@ -184,7 +184,7 @@ toondb-bulk query \
 Display index metadata.
 
 ```bash
-toondb-bulk info --index index.hnsw
+sochdb-bulk info --index index.hnsw
 
 # Output:
 # Dimension: 768
@@ -198,7 +198,7 @@ toondb-bulk info --index index.hnsw
 Convert between vector formats.
 
 ```bash
-toondb-bulk convert \
+sochdb-bulk convert \
     --input vectors.npy \
     --output vectors.raw \
     --to-format raw_f32 \
@@ -209,29 +209,29 @@ toondb-bulk convert \
 
 | Variable | Description |
 |----------|-------------|
-| `TOONDB_BULK_PATH` | Override bundled binary path |
+| `SOCHDB_BULK_PATH` | Override bundled binary path |
 
 ### Error Handling
 
 ```bash
 # Input not found
-$ toondb-bulk build-index --input missing.npy --output out.hnsw --dimension 768
+$ sochdb-bulk build-index --input missing.npy --output out.hnsw --dimension 768
 [Bulk] Error: Input file not found: /path/to/missing.npy
 
 # Output exists
-$ toondb-bulk build-index --input data.npy --output existing.hnsw --dimension 768
+$ sochdb-bulk build-index --input data.npy --output existing.hnsw --dimension 768
 [Bulk] Error: Output file already exists: /path/to/existing.hnsw
        Use --overwrite to replace it
 
 # Invalid extension
-$ toondb-bulk build-index --input data.txt --output out.hnsw --dimension 768
+$ sochdb-bulk build-index --input data.txt --output out.hnsw --dimension 768
 [Bulk] Error: Invalid file extension: .txt
        Expected one of: .npy, .raw, .bin
 ```
 
 ---
 
-## toondb-grpc-server
+## sochdb-grpc-server
 
 gRPC server for remote vector search operations.
 
@@ -239,13 +239,13 @@ gRPC server for remote vector search operations.
 
 ```bash
 # Start server
-toondb-grpc-server
+sochdb-grpc-server
 
 # Custom host and port
-toondb-grpc-server --host 0.0.0.0 --port 50051
+sochdb-grpc-server --host 0.0.0.0 --port 50051
 
 # Check status
-toondb-grpc-server status --port 50051
+sochdb-grpc-server status --port 50051
 ```
 
 ### Features
@@ -261,7 +261,7 @@ toondb-grpc-server status --port 50051
 ### Options
 
 ```
-Usage: toondb-grpc-server [OPTIONS] [COMMAND]
+Usage: sochdb-grpc-server [OPTIONS] [COMMAND]
 
 Commands:
   status   Check if server is running
@@ -278,13 +278,13 @@ Options:
 
 ```bash
 # Local development
-toondb-grpc-server --debug
+sochdb-grpc-server --debug
 
 # Production (all interfaces)
-toondb-grpc-server --host 0.0.0.0 --port 50051
+sochdb-grpc-server --host 0.0.0.0 --port 50051
 
 # Check if running
-toondb-grpc-server status --port 50051
+sochdb-grpc-server status --port 50051
 # Output: [gRPC] Running on 127.0.0.1:50051
 ```
 
@@ -292,8 +292,8 @@ toondb-grpc-server status --port 50051
 
 ```python
 import grpc
-from toondb_pb2 import VectorSearchRequest
-from toondb_pb2_grpc import VectorServiceStub
+from sochdb_pb2 import VectorSearchRequest
+from sochdb_pb2_grpc import VectorServiceStub
 
 # Connect
 channel = grpc.insecure_channel('localhost:50051')
@@ -316,18 +316,18 @@ for neighbor in response.neighbors:
 
 | Variable | Description |
 |----------|-------------|
-| `TOONDB_GRPC_SERVER_PATH` | Override bundled binary path |
+| `SOCHDB_GRPC_SERVER_PATH` | Override bundled binary path |
 
 ### Error Handling
 
 ```bash
 # Port in use
-$ toondb-grpc-server --port 8080
+$ sochdb-grpc-server --port 8080
 [gRPC] Error: Port 8080 is already in use by nginx (PID: 1234)
        Try a different port with --port <PORT>
 
 # Privileged port
-$ toondb-grpc-server --port 80
+$ sochdb-grpc-server --port 80
 [gRPC] Error: Port 80 requires root privileges
        Use a port >= 1024 or run with sudo
 ```
@@ -356,32 +356,32 @@ All CLI tools use consistent exit codes:
 
 ```bash
 # Had to find and use absolute paths
-/path/to/venv/lib/python3.11/site-packages/toondb/_bin/macos/toondb-server --db ./my_db
+/path/to/venv/lib/python3.11/site-packages/sochdb/_bin/macos/sochdb-server --db ./my_db
 
 # No status checking
-ps aux | grep toondb-server
+ps aux | grep sochdb-server
 
 # Manual cleanup of stale sockets
-rm ./my_db/toondb.sock
+rm ./my_db/sochdb.sock
 
 # No validation
-./toondb-bulk build-index --input missing.npy  # Cryptic error
+./sochdb-bulk build-index --input missing.npy  # Cryptic error
 ```
 
 ### After (v0.2.9)
 
 ```bash
 # Simple, global commands
-toondb-server --db ./my_db
+sochdb-server --db ./my_db
 
 # Built-in status checking
-toondb-server status --db ./my_db
+sochdb-server status --db ./my_db
 
 # Automatic stale socket cleanup
-toondb-server --db ./my_db  # Cleans up stale sockets automatically
+sochdb-server --db ./my_db  # Cleans up stale sockets automatically
 
 # Clear, actionable errors
-toondb-bulk build-index --input missing.npy
+sochdb-bulk build-index --input missing.npy
 # [Bulk] Error: Input file not found: /path/to/missing.npy
 ```
 
@@ -393,19 +393,19 @@ toondb-bulk build-index --input missing.npy
 
 ```bash
 # Check binary resolution
-python -c "from toondb.cli_server import get_server_binary; print(get_server_binary())"
+python -c "from sochdb.cli_server import get_server_binary; print(get_server_binary())"
 
 # Set path manually
-export TOONDB_SERVER_PATH=/path/to/toondb-server
-export TOONDB_BULK_PATH=/path/to/toondb-bulk
-export TOONDB_GRPC_SERVER_PATH=/path/to/toondb-grpc-server
+export SOCHDB_SERVER_PATH=/path/to/sochdb-server
+export SOCHDB_BULK_PATH=/path/to/sochdb-bulk
+export SOCHDB_GRPC_SERVER_PATH=/path/to/sochdb-grpc-server
 ```
 
 ### Permission Issues
 
 ```bash
 # Make binary executable
-chmod +x /path/to/_bin/*/toondb-*
+chmod +x /path/to/_bin/*/sochdb-*
 
 # Check directory permissions
 ls -la ./my_database

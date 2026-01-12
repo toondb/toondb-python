@@ -13,7 +13,7 @@
 # limitations under the License.
 
 """
-Tests for ToonDB Python SDK - Namespace, Collection, and Search APIs
+Tests for SochDB Python SDK - Namespace, Collection, and Search APIs
 
 These tests cover:
 - Task 8: Namespace Handle API
@@ -27,7 +27,7 @@ import pytest
 from unittest.mock import Mock, MagicMock, patch
 
 # Test imports
-from toondb import (
+from sochdb import (
     # Namespace
     Namespace,
     NamespaceConfig,
@@ -49,7 +49,7 @@ from toondb import (
     estimate_tokens,
     split_by_tokens,
     # Errors
-    ToonDBError,
+    SochDBError,
     ErrorCode,
     NamespaceError,
     NamespaceNotFoundError,
@@ -121,7 +121,7 @@ class TestErrorTaxonomy:
     def test_error_inheritance(self):
         """Test error class hierarchy."""
         assert issubclass(NamespaceNotFoundError, NamespaceError)
-        assert issubclass(NamespaceError, ToonDBError)
+        assert issubclass(NamespaceError, SochDBError)
         assert issubclass(CollectionNotFoundError, CollectionError)
         assert issubclass(DimensionMismatchError, ValidationError)
 

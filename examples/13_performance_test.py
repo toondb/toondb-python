@@ -8,11 +8,11 @@ from pathlib import Path
 
 # Add the SDK to path
 sys.path.append(str(Path(__file__).parent.parent / "src"))
-from toondb.vector import VectorIndex
+from sochdb.vector import VectorIndex
 
 def test_performance():
     print('=' * 80)
-    print('ToonDB Performance Optimization Results')
+    print('SochDB Performance Optimization Results')
     print('=' * 80)
     
     np.random.seed(42)

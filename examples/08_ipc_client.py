@@ -2,22 +2,22 @@
 """
 Example 08: IPC Client - Multi-process access via Unix socket
 
-NOTE: This example requires a running ToonDB IPC server.
-Start the server first: cargo run --bin ipc_server -- --socket /tmp/toondb.sock
+NOTE: This example requires a running SochDB IPC server.
+Start the server first: cargo run --bin ipc_server -- --socket /tmp/sochdb.sock
 """
 
 import sys, os
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from toondb import IpcClient, Query
-from toondb.errors import ConnectionError
+from sochdb import IpcClient, Query
+from sochdb.errors import ConnectionError
 
-SOCKET_PATH = "/tmp/toondb.sock"
+SOCKET_PATH = "/tmp/sochdb.sock"
 
 def main():
     print("=" * 60)
-    print("ToonDB - Example 08: IPC Client")
+    print("SochDB - Example 08: IPC Client")
     print("=" * 60)
     
     try:
@@ -26,7 +26,7 @@ def main():
     except ConnectionError as e:
         print(f"✗ Could not connect: {e}")
         print("\nTo run this example, start the IPC server first:")
-        print("  cargo run --bin ipc_server -- --socket /tmp/toondb.sock")
+        print("  cargo run --bin ipc_server -- --socket /tmp/sochdb.sock")
         return
     
     try:

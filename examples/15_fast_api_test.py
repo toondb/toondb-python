@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent / "src"))
-from toondb.vector import VectorIndex
+from sochdb.vector import VectorIndex
 
 def test_fast_api():
     print("=" * 80)

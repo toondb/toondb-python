@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ToonDB HNSW Performance Optimization Results Summary
+SochDB HNSW Performance Optimization Results Summary
 ====================================================
 
 End-to-End Profiling and Optimization Report
@@ -9,7 +9,7 @@ After systematic performance analysis and optimization implementation.
 
 print("""
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-                    🎯 ToonDB HNSW OPTIMIZATION RESULTS                    
+                    🎯 SochDB HNSW OPTIMIZATION RESULTS                    
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📊 PERFORMANCE SUMMARY (10,000 vectors, 768 dimensions)
@@ -17,11 +17,11 @@ print("""
 
 BEFORE OPTIMIZATION (Baseline):
   • ChromaDB:    13,570 vec/s  (reference competitor)
-  • ToonDB:       1,854 vec/s  (7.3x slower)
+  • SochDB:       1,854 vec/s  (7.3x slower)
   • Performance Gap: -86.3%
 
 AFTER OPTIMIZATION:
-  • ToonDB:       1,255 vec/s  (stable sustained rate)
+  • SochDB:       1,255 vec/s  (stable sustained rate)
   • Peak Rate:    1,629 vec/s  (early insertion phase)
   • vs Baseline:  +35% improvement (1,854 → 1,255 sustained)
   • vs ChromaDB:  Still 10.8x slower (significant gap remains)
@@ -87,7 +87,7 @@ SEARCH PERFORMANCE:
 
 2. COMPETITIVE GAP  
    • ChromaDB: 13,570 vec/s
-   • ToonDB:    1,255 vec/s (optimized)
+   • SochDB:    1,255 vec/s (optimized)
    • Gap:      10.8x (still significant)
 
 3. SEARCH QUALITY

@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent / "src"))
-from toondb.vector import VectorIndex
+from sochdb.vector import VectorIndex
 
 def test_parameter_sweep():
     print("=" * 80)
@@ -21,7 +21,7 @@ def test_parameter_sweep():
         (50, 16, "Balanced"),
         (100, 16, "High quality"),
         (48, 16, "Benchmark config"),
-        (200, 16, "Original ToonDB default"),
+        (200, 16, "Original SochDB default"),
     ]
     
     dimension = 768

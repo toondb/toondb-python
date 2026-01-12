@@ -1,11 +1,11 @@
 # =============================================================================
-# ToonDB Python SDK Release Pipeline
+# SochDB Python SDK Release Pipeline
 # =============================================================================
 #
 # WORKFLOW FLOW:
 #
 # ┌─────────────────────────────────────────────────────────────────┐
-# │ 1. Download binaries from toondb/toondb + Build (PARALLEL)     │
+# │ 1. Download binaries from sochdb/sochdb + Build (PARALLEL)     │
 # ├─────────────────────────────────────────────────────────────────┤
 # │  ├─ build-wheel (Linux x86_64)   → downloads binary + builds   │
 # │  ├─ build-wheel (macOS ARM64)    → downloads binary + builds   │
@@ -24,18 +24,18 @@
 # │ 3. summary          → Shows comprehensive status               │
 # └─────────────────────────────────────────────────────────────────┘
 #
-# This workflow packages pre-built ToonDB binaries into Python wheels.
+# This workflow packages pre-built SochDB binaries into Python wheels.
 #
-# IMPORTANT: This SDK pulls pre-compiled binaries from the main ToonDB 
-# repository (toondb/toondb) and wraps them in Python wheels. Each wheel 
+# IMPORTANT: This SDK pulls pre-compiled binaries from the main SochDB 
+# repository (sochdb/sochdb) and wraps them in Python wheels. Each wheel 
 # contains platform-specific binaries:
-#   - toondb-bulk (CLI tool for bulk operations)
-#   - toondb-server (standalone server)
-#   - toondb-grpc-server (gRPC server)
-#   - libtoondb_storage.* (FFI library)
-#   - libtoondb_index.* (FFI library)
+#   - sochdb-bulk (CLI tool for bulk operations)
+#   - sochdb-server (standalone server)
+#   - sochdb-grpc-server (gRPC server)
+#   - libsochdb_storage.* (FFI library)
+#   - libsochdb_index.* (FFI library)
 #
-# The version input MUST match an existing release in toondb/toondb repo.
+# The version input MUST match an existing release in sochdb/sochdb repo.
 #
 # Platforms supported:
 #   - Linux x86_64 (manylinux_2_17)
@@ -50,7 +50,7 @@
 #
 # PyPI - NO TOKEN NEEDED!
 #   Uses OIDC Trusted Publisher (configure at PyPI project settings)
-#   https://pypi.org/manage/project/toondb-client/settings/publishing/
+#   https://pypi.org/manage/project/sochdb-client/settings/publishing/
 #
 # GitHub Releases - Requires write permission
 #   Uses GITHUB_TOKEN with contents: write permission
@@ -66,8 +66,8 @@ on:
         description: 'Toondb-client release version (e.g., 0.3.1)'
         required: true
         type: string
-      toondb_version:
-        description: 'Toondb release version (e.g., 0.3.1) - MUST match an existing toondb/toondb release tag'
+      sochdb_version:
+        description: 'Toondb release version (e.g., 0.3.1) - MUST match an existing sochdb/sochdb release tag'
         required: false
         type: string
       dry_run:
@@ -77,7 +77,7 @@ on:
         type: boolean
 
 env:
-  TOONDB_REPO: toondb/toondb
+  SOCHDB_REPO: sochdb/sochdb
 
 jobs:
   # ===========================================================================
@@ -117,14 +117,14 @@ jobs:
       - name: Create directory structure
         shell: bash
         run: |
-          mkdir -p src/toondb/_bin/${{ matrix.target }}
-          mkdir -p src/toondb/lib/${{ matrix.target }}
+          mkdir -p src/sochdb/_bin/${{ matrix.target }}
+          mkdir -p src/sochdb/lib/${{ matrix.target }}
 
-      - name: Download binaries from main ToonDB release
+      - name: Download binaries from main SochDB release
         shell: bash
         run: |
-          # Use toondb_version if provided, otherwise use version
-          VERSION="${{ inputs.toondb_version }}"
+          # Use sochdb_version if provided, otherwise use version
+          VERSION="${{ inputs.sochdb_version }}"
           if [ -z "$VERSION" ]; then
             VERSION="${{ inputs.version }}"
           fi
@@ -133,14 +133,14 @@ jobs:
           TARGET="${{ matrix.target }}"
           
           if [ "${{ matrix.archive_ext }}" = "zip" ]; then
-            ASSET_NAME="toondb-${VERSION}-${TARGET}.zip"
+            ASSET_NAME="sochdb-${VERSION}-${TARGET}.zip"
           else
-            ASSET_NAME="toondb-${VERSION}-${TARGET}.tar.gz"
+            ASSET_NAME="sochdb-${VERSION}-${TARGET}.tar.gz"
           fi
           
-          DOWNLOAD_URL="https://github.com/${{ env.TOONDB_REPO }}/releases/download/${TAG}/${ASSET_NAME}"
-          echo "Downloading ToonDB binaries from main repository:"
-          echo "  Repository: ${{ env.TOONDB_REPO }}"
+          DOWNLOAD_URL="https://github.com/${{ env.SOCHDB_REPO }}/releases/download/${TAG}/${ASSET_NAME}"
+          echo "Downloading SochDB binaries from main repository:"
+          echo "  Repository: ${{ env.SOCHDB_REPO }}"
           echo "  Version: ${VERSION}"
           echo "  URL: $DOWNLOAD_URL"
           
@@ -163,30 +163,30 @@ jobs:
           TARGET="${{ matrix.target }}"
           
           # Copy binaries to _bin/
-          cp ${TARGET}/toondb-bulk src/toondb/_bin/${TARGET}/ 2>/dev/null || \
-            find . -maxdepth 2 -name "toondb-bulk" -type f -exec cp {} src/toondb/_bin/${TARGET}/ \;
+          cp ${TARGET}/sochdb-bulk src/sochdb/_bin/${TARGET}/ 2>/dev/null || \
+            find . -maxdepth 2 -name "sochdb-bulk" -type f -exec cp {} src/sochdb/_bin/${TARGET}/ \;
           
-          cp ${TARGET}/toondb-server src/toondb/_bin/${TARGET}/ 2>/dev/null || \
-            find . -maxdepth 2 -name "toondb-server" -type f -exec cp {} src/toondb/_bin/${TARGET}/ \;
+          cp ${TARGET}/sochdb-server src/sochdb/_bin/${TARGET}/ 2>/dev/null || \
+            find . -maxdepth 2 -name "sochdb-server" -type f -exec cp {} src/sochdb/_bin/${TARGET}/ \;
           
-          cp ${TARGET}/toondb-grpc-server src/toondb/_bin/${TARGET}/ 2>/dev/null || \
-            find . -maxdepth 2 -name "toondb-grpc-server" -type f -exec cp {} src/toondb/_bin/${TARGET}/ \;
+          cp ${TARGET}/sochdb-grpc-server src/sochdb/_bin/${TARGET}/ 2>/dev/null || \
+            find . -maxdepth 2 -name "sochdb-grpc-server" -type f -exec cp {} src/sochdb/_bin/${TARGET}/ \;
           
           # Copy shared libraries to lib/
-          cp ${TARGET}/libtoondb_storage* src/toondb/lib/${TARGET}/ 2>/dev/null || \
-            find . -maxdepth 2 -name "libtoondb_storage*" -type f -exec cp {} src/toondb/lib/${TARGET}/ \;
+          cp ${TARGET}/libsochdb_storage* src/sochdb/lib/${TARGET}/ 2>/dev/null || \
+            find . -maxdepth 2 -name "libsochdb_storage*" -type f -exec cp {} src/sochdb/lib/${TARGET}/ \;
           
-          cp ${TARGET}/libtoondb_index* src/toondb/lib/${TARGET}/ 2>/dev/null || \
-            find . -maxdepth 2 -name "libtoondb_index*" -type f -exec cp {} src/toondb/lib/${TARGET}/ \;
+          cp ${TARGET}/libsochdb_index* src/sochdb/lib/${TARGET}/ 2>/dev/null || \
+            find . -maxdepth 2 -name "libsochdb_index*" -type f -exec cp {} src/sochdb/lib/${TARGET}/ \;
           
           # Make executables
-          chmod +x src/toondb/_bin/${TARGET}/* 2>/dev/null || true
-          chmod +x src/toondb/lib/${TARGET}/* 2>/dev/null || true
+          chmod +x src/sochdb/_bin/${TARGET}/* 2>/dev/null || true
+          chmod +x src/sochdb/lib/${TARGET}/* 2>/dev/null || true
           
           echo "=== Binaries ==="
-          ls -la src/toondb/_bin/${TARGET}/
+          ls -la src/sochdb/_bin/${TARGET}/
           echo "=== Libraries ==="
-          ls -la src/toondb/lib/${TARGET}/
+          ls -la src/sochdb/lib/${TARGET}/
 
       - name: Copy binaries and libraries to SDK (Windows)
         if: matrix.os == 'windows-latest'
@@ -194,24 +194,24 @@ jobs:
         run: |
           TARGET="${{ matrix.target }}"
           
-          # Copy binaries to _bin/ (no toondb-server on Windows)
-          cp ${TARGET}/toondb-bulk.exe src/toondb/_bin/${TARGET}/ 2>/dev/null || \
-            find . -maxdepth 2 -name "toondb-bulk.exe" -type f -exec cp {} src/toondb/_bin/${TARGET}/ \;
+          # Copy binaries to _bin/ (no sochdb-server on Windows)
+          cp ${TARGET}/sochdb-bulk.exe src/sochdb/_bin/${TARGET}/ 2>/dev/null || \
+            find . -maxdepth 2 -name "sochdb-bulk.exe" -type f -exec cp {} src/sochdb/_bin/${TARGET}/ \;
           
-          cp ${TARGET}/toondb-grpc-server.exe src/toondb/_bin/${TARGET}/ 2>/dev/null || \
-            find . -maxdepth 2 -name "toondb-grpc-server.exe" -type f -exec cp {} src/toondb/_bin/${TARGET}/ \;
+          cp ${TARGET}/sochdb-grpc-server.exe src/sochdb/_bin/${TARGET}/ 2>/dev/null || \
+            find . -maxdepth 2 -name "sochdb-grpc-server.exe" -type f -exec cp {} src/sochdb/_bin/${TARGET}/ \;
           
           # Copy shared libraries (DLLs) to lib/
-          cp ${TARGET}/toondb_storage.dll src/toondb/lib/${TARGET}/ 2>/dev/null || \
-            find . -maxdepth 2 -name "toondb_storage.dll" -type f -exec cp {} src/toondb/lib/${TARGET}/ \;
+          cp ${TARGET}/sochdb_storage.dll src/sochdb/lib/${TARGET}/ 2>/dev/null || \
+            find . -maxdepth 2 -name "sochdb_storage.dll" -type f -exec cp {} src/sochdb/lib/${TARGET}/ \;
           
-          cp ${TARGET}/toondb_index.dll src/toondb/lib/${TARGET}/ 2>/dev/null || \
-            find . -maxdepth 2 -name "toondb_index.dll" -type f -exec cp {} src/toondb/lib/${TARGET}/ \;
+          cp ${TARGET}/sochdb_index.dll src/sochdb/lib/${TARGET}/ 2>/dev/null || \
+            find . -maxdepth 2 -name "sochdb_index.dll" -type f -exec cp {} src/sochdb/lib/${TARGET}/ \;
           
           echo "=== Binaries ==="
-          ls -la src/toondb/_bin/${TARGET}/
+          ls -la src/sochdb/_bin/${TARGET}/
           echo "=== Libraries ==="
-          ls -la src/toondb/lib/${TARGET}/
+          ls -la src/sochdb/lib/${TARGET}/
 
       - name: Update package version
         shell: bash
@@ -270,14 +270,14 @@ jobs:
 
       - name: Create directory structure
         run: |
-          mkdir -p src/toondb/_bin/${{ matrix.target }}
-          mkdir -p src/toondb/lib/${{ matrix.target }}
+          mkdir -p src/sochdb/_bin/${{ matrix.target }}
+          mkdir -p src/sochdb/lib/${{ matrix.target }}
 
-      - name: Download binaries from main ToonDB release
+      - name: Download binaries from main SochDB release
         shell: bash
         run: |
-          # Use toondb_version if provided, otherwise use version
-          VERSION="${{ inputs.toondb_version }}"
+          # Use sochdb_version if provided, otherwise use version
+          VERSION="${{ inputs.sochdb_version }}"
           if [ -z "$VERSION" ]; then
             VERSION="${{ inputs.version }}"
           fi
@@ -286,13 +286,13 @@ jobs:
           TARGET="${{ matrix.target }}"
           
           if [ "${{ matrix.archive_ext }}" = "zip" ]; then
-            ASSET_NAME="toondb-${VERSION}-${TARGET}.zip"
+            ASSET_NAME="sochdb-${VERSION}-${TARGET}.zip"
           else
-            ASSET_NAME="toondb-${VERSION}-${TARGET}.tar.gz"
+            ASSET_NAME="sochdb-${VERSION}-${TARGET}.tar.gz"
           fi
           
-          DOWNLOAD_URL="https://github.com/${{ env.TOONDB_REPO }}/releases/download/${TAG}/${ASSET_NAME}"
-          echo "Downloading ToonDB binaries for sdist:"
+          DOWNLOAD_URL="https://github.com/${{ env.SOCHDB_REPO }}/releases/download/${TAG}/${ASSET_NAME}"
+          echo "Downloading SochDB binaries for sdist:"
           echo "  URL: $DOWNLOAD_URL"
           
           curl -L -f -o release-archive.${{ matrix.archive_ext }} "$DOWNLOAD_URL"
@@ -312,24 +312,24 @@ jobs:
           # Copy binaries
           if [ "$TARGET" = "x86_64-pc-windows-msvc" ]; then
             # Windows binaries
-            find . -maxdepth 2 -name "toondb-bulk.exe" -type f -exec cp {} src/toondb/_bin/${TARGET}/ \;
-            find . -maxdepth 2 -name "toondb-grpc-server.exe" -type f -exec cp {} src/toondb/_bin/${TARGET}/ \;
-            find . -maxdepth 2 -name "toondb_storage.dll" -type f -exec cp {} src/toondb/lib/${TARGET}/ \;
-            find . -maxdepth 2 -name "toondb_index.dll" -type f -exec cp {} src/toondb/lib/${TARGET}/ \;
+            find . -maxdepth 2 -name "sochdb-bulk.exe" -type f -exec cp {} src/sochdb/_bin/${TARGET}/ \;
+            find . -maxdepth 2 -name "sochdb-grpc-server.exe" -type f -exec cp {} src/sochdb/_bin/${TARGET}/ \;
+            find . -maxdepth 2 -name "sochdb_storage.dll" -type f -exec cp {} src/sochdb/lib/${TARGET}/ \;
+            find . -maxdepth 2 -name "sochdb_index.dll" -type f -exec cp {} src/sochdb/lib/${TARGET}/ \;
           else
             # Unix binaries
-            find . -maxdepth 2 -name "toondb-bulk" -type f -exec cp {} src/toondb/_bin/${TARGET}/ \;
-            find . -maxdepth 2 -name "toondb-server" -type f -exec cp {} src/toondb/_bin/${TARGET}/ \; || true
-            find . -maxdepth 2 -name "toondb-grpc-server" -type f -exec cp {} src/toondb/_bin/${TARGET}/ \;
-            find . -maxdepth 2 -name "libtoondb_storage*" -type f -exec cp {} src/toondb/lib/${TARGET}/ \;
-            find . -maxdepth 2 -name "libtoondb_index*" -type f -exec cp {} src/toondb/lib/${TARGET}/ \;
-            chmod +x src/toondb/_bin/${TARGET}/* 2>/dev/null || true
+            find . -maxdepth 2 -name "sochdb-bulk" -type f -exec cp {} src/sochdb/_bin/${TARGET}/ \;
+            find . -maxdepth 2 -name "sochdb-server" -type f -exec cp {} src/sochdb/_bin/${TARGET}/ \; || true
+            find . -maxdepth 2 -name "sochdb-grpc-server" -type f -exec cp {} src/sochdb/_bin/${TARGET}/ \;
+            find . -maxdepth 2 -name "libsochdb_storage*" -type f -exec cp {} src/sochdb/lib/${TARGET}/ \;
+            find . -maxdepth 2 -name "libsochdb_index*" -type f -exec cp {} src/sochdb/lib/${TARGET}/ \;
+            chmod +x src/sochdb/_bin/${TARGET}/* 2>/dev/null || true
           fi
           
           echo "=== Binaries for ${TARGET} ==="
-          ls -la src/toondb/_bin/${TARGET}/ 2>/dev/null || echo "No binaries"
+          ls -la src/sochdb/_bin/${TARGET}/ 2>/dev/null || echo "No binaries"
           echo "=== Libraries for ${TARGET} ==="
-          ls -la src/toondb/lib/${TARGET}/ 2>/dev/null || echo "No libraries"
+          ls -la src/sochdb/lib/${TARGET}/ 2>/dev/null || echo "No libraries"
 
       - name: Update package version
         run: |
@@ -379,25 +379,25 @@ jobs:
         id: release_notes
         run: |
           cat > release_notes.md << 'EOF'
-          ## ToonDB Python SDK v${{ inputs.version }}
+          ## SochDB Python SDK v${{ inputs.version }}
           
-          Python SDK wrapping pre-built binaries from [toondb/toondb v${{ inputs.toondb_version || inputs.version }}](https://github.com/toondb/toondb/releases/tag/v${{ inputs.toondb_version || inputs.version }})
+          Python SDK wrapping pre-built binaries from [sochdb/sochdb v${{ inputs.sochdb_version || inputs.version }}](https://github.com/sochdb/sochdb/releases/tag/v${{ inputs.sochdb_version || inputs.version }})
           
           ### Installation
           
           ```bash
-          pip install toondb-client==${{ inputs.version }}
+          pip install sochdb-client==${{ inputs.version }}
           ```
           
           ### What's Included
           
-          This release contains platform-specific wheels with pre-compiled ToonDB binaries:
+          This release contains platform-specific wheels with pre-compiled SochDB binaries:
           
-          - **toondb-bulk**: CLI tool for bulk data operations
-          - **toondb-server**: Standalone database server
-          - **toondb-grpc-server**: gRPC server implementation
-          - **libtoondb_storage**: Native storage FFI library
-          - **libtoondb_index**: Native indexing FFI library
+          - **sochdb-bulk**: CLI tool for bulk data operations
+          - **sochdb-server**: Standalone database server
+          - **sochdb-grpc-server**: gRPC server implementation
+          - **libsochdb_storage**: Native storage FFI library
+          - **libsochdb_index**: Native indexing FFI library
           
           ### Supported Platforms
           
@@ -416,17 +416,17 @@ jobs:
           ### Package Contents
           
           Each wheel includes:
-          - Python SDK code (`toondb` package)
+          - Python SDK code (`sochdb` package)
           - Platform-specific binaries in `_bin/<platform>/`
           - Shared libraries in `lib/<platform>/`
           
           ### Source Distribution
           
-          The source distribution (`.tar.gz`) is also available for custom builds, though binaries are not included and would need to be obtained separately from the main ToonDB repository.
+          The source distribution (`.tar.gz`) is also available for custom builds, though binaries are not included and would need to be obtained separately from the main SochDB repository.
           
           ---
           
-          **Binary Source**: These Python wheels bundle pre-compiled binaries from the [ToonDB main repository](https://github.com/toondb/toondb) release v${{ inputs.toondb_version || inputs.version }}.
+          **Binary Source**: These Python wheels bundle pre-compiled binaries from the [SochDB main repository](https://github.com/sochdb/sochdb) release v${{ inputs.sochdb_version || inputs.version }}.
           EOF
 
       - name: Create GitHub Release
@@ -521,7 +521,7 @@ jobs:
 
       - name: Generate comprehensive summary
         run: |
-          echo "## 🎉 ToonDB Python SDK v${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "## 🎉 SochDB Python SDK v${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           if [ "${{ inputs.dry_run }}" = "true" ]; then
@@ -533,21 +533,21 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 📦 Binary Source" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          TOONDB_VERSION="${{ inputs.toondb_version }}"
-          if [ -z "$TOONDB_VERSION" ]; then
-            TOONDB_VERSION="${{ inputs.version }}"
+          SOCHDB_VERSION="${{ inputs.sochdb_version }}"
+          if [ -z "$SOCHDB_VERSION" ]; then
+            SOCHDB_VERSION="${{ inputs.version }}"
           fi
-          echo "**Binaries pulled from:** [toondb/toondb v${TOONDB_VERSION}](https://github.com/${{ env.TOONDB_REPO }}/releases/tag/v${TOONDB_VERSION})" >> $GITHUB_STEP_SUMMARY
+          echo "**Binaries pulled from:** [sochdb/sochdb v${SOCHDB_VERSION}](https://github.com/${{ env.SOCHDB_REPO }}/releases/tag/v${SOCHDB_VERSION})" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "This Python SDK wraps pre-compiled binaries from the main ToonDB repository." >> $GITHUB_STEP_SUMMARY
+          echo "This Python SDK wraps pre-compiled binaries from the main SochDB repository." >> $GITHUB_STEP_SUMMARY
           echo "Each wheel contains platform-specific:" >> $GITHUB_STEP_SUMMARY
-          echo "- \`toondb-bulk\`, \`toondb-server\`, \`toondb-grpc-server\` (executables)" >> $GITHUB_STEP_SUMMARY
-          echo "- \`libtoondb_storage.*\`, \`libtoondb_index.*\` (FFI libraries)" >> $GITHUB_STEP_SUMMARY
+          echo "- \`sochdb-bulk\`, \`sochdb-server\`, \`sochdb-grpc-server\` (executables)" >> $GITHUB_STEP_SUMMARY
+          echo "- \`libsochdb_storage.*\`, \`libsochdb_index.*\` (FFI libraries)" >> $GITHUB_STEP_SUMMARY
           
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "### 📥 Installation" >> $GITHUB_STEP_SUMMARY
           echo '```bash' >> $GITHUB_STEP_SUMMARY
-          echo "pip install toondb-client==${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
+          echo "pip install sochdb-client==${{ inputs.version }}" >> $GITHUB_STEP_SUMMARY
           echo '```' >> $GITHUB_STEP_SUMMARY
           
           echo "" >> $GITHUB_STEP_SUMMARY
@@ -591,7 +591,7 @@ jobs:
           if [ "${{ inputs.dry_run }}" != "true" ]; then
             echo "" >> $GITHUB_STEP_SUMMARY
             echo "### 🔗 Links" >> $GITHUB_STEP_SUMMARY
-            echo "- 📦 [PyPI Package](https://pypi.org/project/toondb-client/${{ inputs.version }}/)" >> $GITHUB_STEP_SUMMARY
+            echo "- 📦 [PyPI Package](https://pypi.org/project/sochdb-client/${{ inputs.version }}/)" >> $GITHUB_STEP_SUMMARY
             echo "- 🏷️ [GitHub Release](https://github.com/${{ github.repository }}/releases/tag/v${{ inputs.version }})" >> $GITHUB_STEP_SUMMARY
-            echo "- 🔧 [Source Binaries](https://github.com/${{ env.TOONDB_REPO }}/releases/tag/v${TOONDB_VERSION})" >> $GITHUB_STEP_SUMMARY
+            echo "- 🔧 [Source Binaries](https://github.com/${{ env.SOCHDB_REPO }}/releases/tag/v${SOCHDB_VERSION})" >> $GITHUB_STEP_SUMMARY
           fi

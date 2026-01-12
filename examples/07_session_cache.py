@@ -7,7 +7,7 @@ import os, shutil, sys, json, time
 from datetime import datetime, timedelta
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
-from toondb import Database
+from sochdb import Database
 
 DB_PATH = "./example_07_db"
 
@@ -49,7 +49,7 @@ class SessionCache:
 
 def main():
     print("=" * 60)
-    print("ToonDB - Example 07: Session Cache")
+    print("SochDB - Example 07: Session Cache")
     print("=" * 60)
     
     cleanup()

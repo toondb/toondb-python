@@ -8,7 +8,7 @@ from datetime import datetime
 from typing import Optional, Dict, List, Any
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
-from toondb import Database
+from sochdb import Database
 
 DB_PATH = "./example_06_db"
 
@@ -54,7 +54,7 @@ class DocumentStore:
 
 def main():
     print("=" * 60)
-    print("ToonDB - Example 06: JSON Documents")
+    print("SochDB - Example 06: JSON Documents")
     print("=" * 60)
     
     cleanup()

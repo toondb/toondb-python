@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent / "src"))
-from toondb.vector import VectorIndex
+from sochdb.vector import VectorIndex
 
 def debug_search_issue():
     print("=" * 80)
@@ -97,7 +97,7 @@ def test_pure_rust_claim():
         
         # Try to run the Rust benchmark
         result = subprocess.run([
-            "/Users/sushanth/toondb/target/release/benchmarks"
+            "/Users/sushanth/sochdb/target/release/benchmarks"
         ], capture_output=True, text=True, timeout=30)
         
         print("Rust benchmark output:")

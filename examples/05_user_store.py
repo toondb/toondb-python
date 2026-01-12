@@ -3,7 +3,7 @@
 Example 05: User Store
 ======================
 
-A complete real-world example: User management system with ToonDB.
+A complete real-world example: User management system with SochDB.
 Demonstrates:
 - User CRUD operations
 - Email uniqueness via secondary index
@@ -27,8 +27,8 @@ from dataclasses import dataclass, asdict
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from toondb import Database
-from toondb.errors import DatabaseError
+from sochdb import Database
+from sochdb.errors import DatabaseError
 
 DB_PATH = "./example_05_db"
 
@@ -81,7 +81,7 @@ class Session:
 # =============================================================================
 
 class UserStore:
-    """ToonDB-backed user management system."""
+    """SochDB-backed user management system."""
     
     def __init__(self, db: Database):
         self.db = db
@@ -299,7 +299,7 @@ class UserStore:
 
 def main():
     print("\n" + "=" * 60)
-    print("ToonDB Python SDK - Example 05: User Store")
+    print("SochDB Python SDK - Example 05: User Store")
     print("=" * 60)
     
     cleanup()

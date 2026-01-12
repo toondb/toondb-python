@@ -14,7 +14,7 @@
 
 import os
 import shutil
-from toondb.database import Database
+from sochdb.database import Database
 
 DB_PATH = "./test_ffi_db"
 

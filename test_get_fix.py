@@ -12,11 +12,11 @@ import shutil
 # Add the src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
-from toondb import Database
+from sochdb import Database
 
 def test_get_returns_none():
     """Test that get() returns None for missing keys"""
-    test_dir = tempfile.mkdtemp(prefix='toondb_test_')
+    test_dir = tempfile.mkdtemp(prefix='sochdb_test_')
     
     try:
         print("🧪 Testing Python SDK get() behavior...\n")

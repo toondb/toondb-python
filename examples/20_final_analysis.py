@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent / "src"))
-from toondb.vector import VectorIndex
+from sochdb.vector import VectorIndex
 
 def measure_performance_directly():
     print("=" * 80)
@@ -104,7 +104,7 @@ def analyze_findings(results):
     
     print(f"Competition Comparison:")
     print(f"  ChromaDB:      {chromadb_perf:,} vec/s")
-    print(f"  ToonDB (best): {best_1k:.0f} vec/s")
+    print(f"  SochDB (best): {best_1k:.0f} vec/s")
     print(f"  Performance gap: {gap:.1f}x slower")
     print()
     
@@ -162,7 +162,7 @@ def generate_recommendations():
     print()
     
     print(f"📊 COMPETITIVE POSITIONING:")
-    print(f"   - ToonDB: High-quality HNSW with exact results")
+    print(f"   - SochDB: High-quality HNSW with exact results")
     print(f"   - ChromaDB: Optimized for speed, potentially different algorithm")
     print(f"   - Trade-off: Quality vs Speed")
     print()
@@ -185,7 +185,7 @@ if __name__ == '__main__':
 🔍 INVESTIGATION COMPLETE:
 
 Initial Problem:
-  ToonDB: 851 vec/s vs ChromaDB: 14,303 vec/s (16.8x gap)
+  SochDB: 851 vec/s vs ChromaDB: 14,303 vec/s (16.8x gap)
 
 Key Findings:
   1. ✅ Optimized ef_construction from 200→100→25 (4x speedup)

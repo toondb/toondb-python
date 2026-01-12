@@ -12,7 +12,7 @@ def run_rust_test():
     # Create a simple Rust test program
     rust_code = '''
 use std::time::Instant;
-use toondb_index::hnsw::{HnswConfig, HnswIndex};
+use sochdb_index::hnsw::{HnswConfig, HnswIndex};
 use rand::Rng;
 
 fn generate_random_vector(dim: usize) -> Vec<f32> {
@@ -89,7 +89,7 @@ name = "rust_hnsw_test"
 path = "/tmp/rust_hnsw_test.rs"
 
 [dependencies]
-toondb-index = { path = "/Users/sushanth/toondb/toondb-index" }
+sochdb-index = { path = "/Users/sushanth/sochdb/sochdb-index" }
 rand = "0.8"
 '''
     

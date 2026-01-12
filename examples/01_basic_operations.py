@@ -3,7 +3,7 @@
 Example 01: Basic Operations
 ============================
 
-This example demonstrates fundamental CRUD operations with ToonDB:
+This example demonstrates fundamental CRUD operations with SochDB:
 - Opening/closing a database
 - Put, Get, Delete operations
 - Using context managers for safe cleanup
@@ -19,8 +19,8 @@ import sys
 # Add parent directory to path for development
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from toondb import Database
-from toondb.errors import DatabaseError
+from sochdb import Database
+from sochdb.errors import DatabaseError
 
 # Database directory for this example
 DB_PATH = "./example_01_db"
@@ -175,7 +175,7 @@ def example_binary_data():
 def main():
     """Run all examples."""
     print("\n" + "=" * 60)
-    print("ToonDB Python SDK - Example 01: Basic Operations")
+    print("SochDB Python SDK - Example 01: Basic Operations")
     print("=" * 60)
     
     # Clean up from previous runs

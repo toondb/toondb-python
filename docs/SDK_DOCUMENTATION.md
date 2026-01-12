@@ -1,6 +1,6 @@
-# ToonDB Python SDK Documentation
+# SochDB Python SDK Documentation
 
-A comprehensive Python client SDK for **ToonDB** - the database optimized for LLM context retrieval.
+A comprehensive Python client SDK for **SochDB** - the database optimized for LLM context retrieval.
 
 ## Table of Contents
 
@@ -29,13 +29,13 @@ A comprehensive Python client SDK for **ToonDB** - the database optimized for LL
 ### From PyPI
 
 ```bash
-pip install toondb-client
+pip install sochdb-client
 ```
 
 ### From Source
 
 ```bash
-cd toondb-python-sdk
+cd sochdb-python-sdk
 pip install -e .
 ```
 
@@ -51,7 +51,7 @@ cargo build --release
 Set the library path:
 
 ```bash
-export TOONDB_LIB_PATH=/path/to/toon_database/target/release
+export SOCHDB_LIB_PATH=/path/to/toon_database/target/release
 ```
 
 ---
@@ -61,7 +61,7 @@ export TOONDB_LIB_PATH=/path/to/toon_database/target/release
 ### Embedded Mode (Single Process)
 
 ```python
-from toondb import Database
+from sochdb import Database
 
 # Open database (creates if not exists)
 db = Database.open("./my_database")
@@ -78,7 +78,7 @@ db.close()
 ### With Context Manager
 
 ```python
-from toondb import Database
+from sochdb import Database
 
 with Database.open("./my_database") as db:
     db.put(b"key", b"value")
@@ -90,12 +90,12 @@ with Database.open("./my_database") as db:
 
 ## Embedded Mode (FFI)
 
-The embedded mode provides direct access to ToonDB via FFI to the Rust library. This is the recommended mode for single-process applications.
+The embedded mode provides direct access to SochDB via FFI to the Rust library. This is the recommended mode for single-process applications.
 
 ### Opening a Database
 
 ```python
-from toondb import Database
+from sochdb import Database
 
 # Basic open
 db = Database.open("./data")
@@ -121,7 +121,7 @@ db.delete(b"key")
 
 ### Path-Native API
 
-ToonDB supports hierarchical data organization using paths:
+SochDB supports hierarchical data organization using paths:
 
 ```python
 # Store at path
@@ -184,14 +184,14 @@ print(stats)
 
 ## IPC Client Mode
 
-IPC mode allows multi-process access to ToonDB via Unix domain sockets.
+IPC mode allows multi-process access to SochDB via Unix domain sockets.
 
 ### Connecting
 
 ```python
-from toondb import IpcClient
+from sochdb import IpcClient
 
-client = IpcClient.connect("/tmp/toondb.sock", timeout=30.0)
+client = IpcClient.connect("/tmp/sochdb.sock", timeout=30.0)
 ```
 
 ### Basic Operations
@@ -231,7 +231,7 @@ commit_ts = client.commit(txn_id)
 ### Query Builder
 
 ```python
-from toondb import Query
+from sochdb import Query
 
 # Fluent query interface
 results = client.query("users/") \
@@ -262,7 +262,7 @@ The Bulk API provides high-throughput vector operations by bypassing Python FFI 
 Instead of crossing the Python/Rust boundary for each vector, it:
 
 1. Writes vectors to a memory-mapped file
-2. Spawns the native `toondb-bulk` binary as a subprocess
+2. Spawns the native `sochdb-bulk` binary as a subprocess
 3. Returns results via stdout/file
 
 ### Why Bulk Operations?
@@ -275,7 +275,7 @@ Instead of crossing the Python/Rust boundary for each vector, it:
 ### Building an Index
 
 ```python
-from toondb.bulk import bulk_build_index
+from sochdb.bulk import bulk_build_index
 import numpy as np
 
 # Your embeddings (N × D)
@@ -297,7 +297,7 @@ print(f"Built {stats.vectors} vectors at {stats.rate:.0f} vec/s")
 ### Querying an Index
 
 ```python
-from toondb.bulk import bulk_query_index
+from sochdb.bulk import bulk_query_index
 import numpy as np
 
 # Single query
@@ -315,20 +315,20 @@ for neighbor in results:
 
 ### Binary Resolution
 
-The SDK automatically finds the `toondb-bulk` binary:
+The SDK automatically finds the `sochdb-bulk` binary:
 
 ```python
-from toondb.bulk import get_toondb_bulk_path
+from sochdb.bulk import get_sochdb_bulk_path
 
 # Returns path to bundled or installed binary
-path = get_toondb_bulk_path()
+path = get_sochdb_bulk_path()
 print(f"Using binary: {path}")
 ```
 
 Resolution order:
-1. **Bundled in wheel**: `_bin/<platform>/toondb-bulk`
-2. **System PATH**: `which toondb-bulk`
-3. **Cargo target**: `../target/release/toondb-bulk` (development)
+1. **Bundled in wheel**: `_bin/<platform>/sochdb-bulk`
+2. **System PATH**: `which sochdb-bulk`
+3. **Cargo target**: `../target/release/sochdb-bulk` (development)
 
 ### Bulk API Reference
 
@@ -338,7 +338,7 @@ Resolution order:
 | `bulk_query_index(index, query, k, ...)` | Query HNSW index for k nearest neighbors |
 | `bulk_info(index)` | Get index metadata |
 | `convert_embeddings_to_raw(embeddings, path)` | Convert to raw f32 format |
-| `get_toondb_bulk_path()` | Get path to toondb-bulk binary |
+| `get_sochdb_bulk_path()` | Get path to sochdb-bulk binary |
 
 ### BulkBuildStats
 
@@ -380,7 +380,7 @@ users[2]{name,email}:Alice,alice@example.com;Bob,bob@example.com
 #### Converting to TOON
 
 ```python
-from toondb import Database
+from sochdb import Database
 
 records = [
     {"id": 1, "name": "Alice", "email": "alice@example.com", "age": 30},
@@ -417,7 +417,7 @@ print(records)
 #### Use Case: RAG with LLMs
 
 ```python
-from toondb import Database
+from sochdb import Database
 import openai
 
 with Database.open("./knowledge_base") as db:
@@ -471,7 +471,7 @@ for key, value in txn.scan_batched(b"prefix:", b"prefix;", batch_size=1000):
 #### Complete Example
 
 ```python
-from toondb import Database
+from sochdb import Database
 import time
 
 with Database.open("./my_db") as db:
@@ -519,7 +519,7 @@ with Database.open("./my_db") as db:
 Monitor database performance and health with runtime statistics.
 
 ```python
-from toondb import Database
+from sochdb import Database
 
 with Database.open("./my_db") as db:
     # Perform operations
@@ -566,7 +566,7 @@ with Database.open("./my_db") as db:
 
 ```python
 import time
-from toondb import Database
+from sochdb import Database
 
 def monitor_database(db_path: str, interval: int = 5):
     """Monitor database statistics every N seconds."""
@@ -596,7 +596,7 @@ monitor_database("./my_db", interval=5)
 Force a checkpoint to ensure all in-memory data is flushed to disk.
 
 ```python
-from toondb import Database
+from sochdb import Database
 
 with Database.open("./my_db") as db:
     # Bulk import
@@ -666,7 +666,7 @@ Run Python code as database triggers with full package support.
 #### Basic Plugin
 
 ```python
-from toondb.plugins import PythonPlugin, PluginRegistry, TriggerEvent
+from sochdb.plugins import PythonPlugin, PluginRegistry, TriggerEvent
 
 # Define a simple validation plugin
 plugin = PythonPlugin(
@@ -697,7 +697,7 @@ print(result["email"])  # "alice@example.com"
 #### Advanced Plugin with Packages
 
 ```python
-from toondb.plugins import PythonPlugin, TriggerAbort
+from sochdb.plugins import PythonPlugin, TriggerAbort
 
 # ML-powered fraud detection
 fraud_detector = PythonPlugin(
@@ -732,7 +732,7 @@ registry.register(fraud_detector)
 #### Available Trigger Events
 
 ```python
-from toondb.plugins import TriggerEvent
+from sochdb.plugins import TriggerEvent
 
 # Row-level triggers
 TriggerEvent.BEFORE_INSERT  # Before inserting a row
@@ -749,7 +749,7 @@ TriggerEvent.ON_BATCH       # On batch operations
 #### Plugin Registry API
 
 ```python
-from toondb.plugins import PluginRegistry
+from sochdb.plugins import PluginRegistry
 
 registry = PluginRegistry()
 
@@ -774,7 +774,7 @@ result = registry.fire("users", TriggerEvent.BEFORE_INSERT, row)
 #### Error Handling
 
 ```python
-from toondb.plugins import TriggerAbort
+from sochdb.plugins import TriggerAbort
 
 try:
     result = registry.fire("users", TriggerEvent.BEFORE_INSERT, row)
@@ -840,13 +840,13 @@ Enable multiple processes to access the same database via Unix domain sockets.
 
 ```bash
 # Basic usage
-toondb-server --db ./my_database
+sochdb-server --db ./my_database
 
 # Custom socket path
-toondb-server --db ./my_database --socket /tmp/custom.sock
+sochdb-server --db ./my_database --socket /tmp/custom.sock
 
 # Production settings
-toondb-server \
+sochdb-server \
     --db ./production_db \
     --max-clients 200 \
     --timeout-ms 60000 \
@@ -857,8 +857,8 @@ toondb-server \
 
 | Option | Default | Description |
 |--------|---------|-------------|
-| `--db <PATH>` | `./toondb_data` | Database directory |
-| `--socket <PATH>` | `<db>/toondb.sock` | Unix socket path |
+| `--db <PATH>` | `./sochdb_data` | Database directory |
+| `--socket <PATH>` | `<db>/sochdb.sock` | Unix socket path |
 | `--max-clients <N>` | 100 | Maximum concurrent connections |
 | `--timeout-ms <MS>` | 30000 | Connection timeout (milliseconds) |
 | `--log-level <LEVEL>` | `info` | Log level (trace/debug/info/warn/error) |
@@ -866,10 +866,10 @@ toondb-server \
 #### Connecting from Python
 
 ```python
-from toondb import IpcClient
+from sochdb import IpcClient
 
 # Connect to server
-client = IpcClient.connect("./my_database/toondb.sock", timeout=30.0)
+client = IpcClient.connect("./my_database/sochdb.sock", timeout=30.0)
 
 # Use like embedded database
 client.put(b"key", b"value")
@@ -922,9 +922,9 @@ The IPC protocol uses a binary message format:
 
 ```python
 # Process 1: Writer
-from toondb import IpcClient
+from sochdb import IpcClient
 
-client = IpcClient.connect("./shared_db/toondb.sock")
+client = IpcClient.connect("./shared_db/sochdb.sock")
 for i in range(1000):
     client.put(f"log:{i}".encode(), f"entry_{i}".encode())
 client.close()
@@ -932,9 +932,9 @@ client.close()
 
 ```python
 # Process 2: Reader
-from toondb import IpcClient
+from sochdb import IpcClient
 
-client = IpcClient.connect("./shared_db/toondb.sock")
+client = IpcClient.connect("./shared_db/sochdb.sock")
 results = client.scan("log:")
 print(f"Found {len(results)} log entries")
 client.close()
@@ -944,25 +944,25 @@ client.close()
 
 The SDK includes globally available CLI tools for managing servers, bulk operations, and high-performance vector search.
 
-#### toondb-server
+#### sochdb-server
 IPC server management.
 ```bash
-toondb-server --db ./database
+sochdb-server --db ./database
 ```
 
-#### toondb-grpc-server
+#### sochdb-grpc-server
 Dedicated gRPC server for vector operations.
 ```bash
-toondb-grpc-server --port 50051
+sochdb-grpc-server --port 50051
 ```
 
-#### toondb-bulk
+#### sochdb-bulk
 
 High-performance bulk operations that bypass Python FFI overhead.
 
 **Build HNSW Index:**
 ```bash
-toondb-bulk build-index \
+sochdb-bulk build-index \
     --input embeddings.npy \
     --output index.hnsw \
     --dimension 768 \
@@ -974,7 +974,7 @@ toondb-bulk build-index \
 
 **Advanced Options:**
 ```bash
-toondb-bulk build-index \
+sochdb-bulk build-index \
     --input vectors.npy \
     --output index.hnsw \
     --dimension 1536 \
@@ -989,7 +989,7 @@ toondb-bulk build-index \
 
 **Query Index:**
 ```bash
-toondb-bulk query \
+sochdb-bulk query \
     --index index.hnsw \
     --query query_vector.raw \
     --k 10 \
@@ -998,7 +998,7 @@ toondb-bulk query \
 
 **Get Index Info:**
 ```bash
-toondb-bulk info --index index.hnsw
+sochdb-bulk info --index index.hnsw
 # Output:
 # Dimension: 768
 # Vectors: 100000
@@ -1008,20 +1008,20 @@ toondb-bulk info --index index.hnsw
 
 **Convert Formats:**
 ```bash
-toondb-bulk convert \
+sochdb-bulk convert \
     --input vectors.npy \
     --output vectors.raw \
     --to-format raw_f32 \
     --dimension 768
 ```
 
-#### toondb-grpc-server
+#### sochdb-grpc-server
 
 gRPC server for remote vector operations.
 
 ```bash
 # Start server
-toondb-grpc-server --host 0.0.0.0 --port 50051 --debug
+sochdb-grpc-server --host 0.0.0.0 --port 50051 --debug
 
 # Options:
 #   --host <HOST>    Bind address [default: 127.0.0.1]
@@ -1032,8 +1032,8 @@ toondb-grpc-server --host 0.0.0.0 --port 50051 --debug
 **Use from Python:**
 ```python
 import grpc
-from toondb_pb2 import VectorSearchRequest
-from toondb_pb2_grpc import VectorServiceStub
+from sochdb_pb2 import VectorSearchRequest
+from sochdb_pb2_grpc import VectorServiceStub
 
 channel = grpc.insecure_channel('localhost:50051')
 stub = VectorServiceStub(channel)
@@ -1151,7 +1151,7 @@ for neighbor in response.neighbors:
 
 | Exception | Description |
 |-----------|-------------|
-| `ToonDBError` | Base exception |
+| `SochDBError` | Base exception |
 | `ConnectionError` | Connection failed |
 | `TransactionError` | Transaction operation failed |
 | `ProtocolError` | Wire protocol error |
@@ -1165,7 +1165,7 @@ for neighbor in response.neighbors:
 ### 1. Session Cache
 
 ```python
-from toondb import Database
+from sochdb import Database
 import json
 from datetime import datetime, timedelta
 
@@ -1324,7 +1324,7 @@ value = db.get(b"key").decode()  # AttributeError if None
 ### 5. Error Handling
 
 ```python
-from toondb.errors import DatabaseError, TransactionError
+from sochdb.errors import DatabaseError, TransactionError
 
 try:
     with db.transaction() as txn:
@@ -1342,23 +1342,23 @@ except DatabaseError as e:
 ### Library Not Found
 
 ```
-DatabaseError: Could not find libtoondb_storage.dylib
+DatabaseError: Could not find libsochdb_storage.dylib
 ```
 
-**Solution**: Set `TOONDB_LIB_PATH` environment variable:
+**Solution**: Set `SOCHDB_LIB_PATH` environment variable:
 ```bash
-export TOONDB_LIB_PATH=/path/to/target/release
+export SOCHDB_LIB_PATH=/path/to/target/release
 ```
 
 ### Connection Refused (IPC)
 
 ```
-ConnectionError: Failed to connect to /tmp/toondb.sock
+ConnectionError: Failed to connect to /tmp/sochdb.sock
 ```
 
 **Solution**: Ensure IPC server is running:
 ```bash
-cargo run --bin ipc_server -- --socket /tmp/toondb.sock
+cargo run --bin ipc_server -- --socket /tmp/sochdb.sock
 ```
 
 ### Transaction Already Completed
@@ -1382,7 +1382,7 @@ txn2.put(...)
 
 ## Version Compatibility
 
-| SDK Version | ToonDB Version | Python |
+| SDK Version | SochDB Version | Python |
 |-------------|----------------|--------|
 | 0.1.x       | 0.1.x          | 3.9+   |
 | 0.2.x       | 0.2.x          | 3.9+   |
@@ -1391,4 +1391,4 @@ txn2.put(...)
 
 ## License
 
-Apache License 2.0 - Same as ToonDB core.
+Apache License 2.0 - Same as SochDB core.

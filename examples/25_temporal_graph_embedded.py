@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ToonDB Python SDK - Example: Temporal Graph Operations (Embedded FFI)
+SochDB Python SDK - Example: Temporal Graph Operations (Embedded FFI)
 
 This demonstrates temporal graph operations using the EMBEDDED FFI mode.
 NO SERVER REQUIRED - runs directly with local database files.
@@ -15,11 +15,11 @@ Comparison:
 """
 
 import time
-from toondb import Database
+from sochdb import Database
 
 def main():
     print("=" * 60)
-    print("ToonDB - Temporal Graph Example (Embedded FFI)")
+    print("SochDB - Temporal Graph Example (Embedded FFI)")
     print("=" * 60)
     
     # Open database with embedded FFI - NO SERVER NEEDED

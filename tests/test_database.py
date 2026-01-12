@@ -12,14 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for ToonDB Embedded Database."""
+"""Tests for SochDB Embedded Database."""
 
 import pytest
 import tempfile
 import os
 
-from toondb import Database, Transaction
-from toondb.errors import DatabaseError, TransactionError
+from sochdb import Database, Transaction
+from sochdb.errors import DatabaseError, TransactionError
 
 
 class TestDatabase:

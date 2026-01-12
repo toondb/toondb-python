@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 """
-Build script for ToonDB Python SDK with bundled native binaries and FFI libraries.
+Build script for SochDB Python SDK with bundled native binaries and FFI libraries.
 
 This script:
-1. Builds the Rust toondb-bulk binary for the current platform
-2. Builds FFI libraries (libtoondb_storage, libtoondb_index) for the current platform
-3. Copies binaries to src/toondb/_bin/<platform>/
-4. Copies libraries to src/toondb/lib/<platform>/
+1. Builds the Rust sochdb-bulk binary for the current platform
+2. Builds FFI libraries (libsochdb_storage, libsochdb_index) for the current platform
+3. Copies binaries to src/sochdb/_bin/<platform>/
+4. Copies libraries to src/sochdb/lib/<platform>/
 5. Allows building wheels with bundled native code
 
 Usage:
     python build_native.py          # Build for current platform
     python build_native.py --all    # Build for all target platforms (requires cross)
     python build_native.py --clean  # Remove bundled binaries and libraries
-    python build_native.py --libs   # Build only FFI libraries (skip toondb-bulk)
+    python build_native.py --libs   # Build only FFI libraries (skip sochdb-bulk)
 """
 
 from __future__ import annotations
@@ -38,15 +38,15 @@ TARGETS = {
 
 # FFI libraries to bundle
 FFI_LIBS = {
-    "toondb-storage": {
-        "darwin": "libtoondb_storage.dylib",
-        "linux": "libtoondb_storage.so",
-        "windows": "toondb_storage.dll",
+    "sochdb-storage": {
+        "darwin": "libsochdb_storage.dylib",
+        "linux": "libsochdb_storage.so",
+        "windows": "sochdb_storage.dll",
     },
-    "toondb-index": {
-        "darwin": "libtoondb_index.dylib",
-        "linux": "libtoondb_index.so",
-        "windows": "toondb_index.dll",
+    "sochdb-index": {
+        "darwin": "libsochdb_index.dylib",
+        "linux": "libsochdb_index.so",
+        "windows": "sochdb_index.dll",
     },
 }
 
@@ -80,12 +80,12 @@ def get_os_name() -> str:
 def get_binary_name() -> str:
     """Get the binary name for the current platform."""
     if platform.system().lower() == "windows":
-        return "toondb-bulk.exe"
-    return "toondb-bulk"
+        return "sochdb-bulk.exe"
+    return "sochdb-bulk"
 
 
 def find_workspace_root() -> Path:
-    """Find the ToonDB workspace root."""
+    """Find the SochDB workspace root."""
     current = Path(__file__).resolve().parent
     while current != current.parent:
         if (current / "Cargo.toml").exists():
@@ -93,20 +93,20 @@ def find_workspace_root() -> Path:
                 if "[workspace]" in f.read():
                     return current
         current = current.parent
-    raise RuntimeError("Could not find ToonDB workspace root")
+    raise RuntimeError("Could not find SochDB workspace root")
 
 
 def build_binary(target: str | None = None, release: bool = True) -> Path:
-    """Build the toondb-bulk binary."""
+    """Build the sochdb-bulk binary."""
     workspace = find_workspace_root()
     
-    cmd = ["cargo", "build", "-p", "toondb-tools"]
+    cmd = ["cargo", "build", "-p", "sochdb-tools"]
     if release:
         cmd.append("--release")
     if target:
         cmd.extend(["--target", target])
     
-    print(f"Building toondb-bulk: {' '.join(cmd)}")
+    print(f"Building sochdb-bulk: {' '.join(cmd)}")
     subprocess.run(cmd, cwd=workspace, check=True)
     
     # Find the built binary
@@ -125,28 +125,28 @@ def build_binary(target: str | None = None, release: bool = True) -> Path:
 
 
 def build_ffi_libraries(target: str | None = None, release: bool = True) -> dict[str, Path]:
-    """Build FFI libraries (libtoondb_storage, libtoondb_index)."""
+    """Build FFI libraries (libsochdb_storage, libsochdb_index)."""
     workspace = find_workspace_root()
     os_name = get_os_name()
     
     # Build storage library
-    cmd = ["cargo", "build", "-p", "toondb-storage"]
+    cmd = ["cargo", "build", "-p", "sochdb-storage"]
     if release:
         cmd.append("--release")
     if target:
         cmd.extend(["--target", target])
     
-    print(f"Building toondb-storage: {' '.join(cmd)}")
+    print(f"Building sochdb-storage: {' '.join(cmd)}")
     subprocess.run(cmd, cwd=workspace, check=True)
     
     # Build index library
-    cmd = ["cargo", "build", "-p", "toondb-index"]
+    cmd = ["cargo", "build", "-p", "sochdb-index"]
     if release:
         cmd.append("--release")
     if target:
         cmd.extend(["--target", target])
     
-    print(f"Building toondb-index: {' '.join(cmd)}")
+    print(f"Building sochdb-index: {' '.join(cmd)}")
     subprocess.run(cmd, cwd=workspace, check=True)
     
     # Find built libraries
@@ -170,7 +170,7 @@ def build_ffi_libraries(target: str | None = None, release: bool = True) -> dict
 
 def install_binary(binary_path: Path, target_platform: str | None = None) -> Path:
     """Install binary to the package _bin directory."""
-    pkg_dir = Path(__file__).parent / "src" / "toondb" / "_bin"
+    pkg_dir = Path(__file__).parent / "src" / "sochdb" / "_bin"
     
     if target_platform is None:
         target_platform = get_platform_dir()
@@ -192,7 +192,7 @@ def install_binary(binary_path: Path, target_platform: str | None = None) -> Pat
 
 def install_ffi_libraries(libs: dict[str, Path], target_platform: str | None = None) -> list[Path]:
     """Install FFI libraries to the package lib directory."""
-    pkg_dir = Path(__file__).parent / "src" / "toondb" / "lib"
+    pkg_dir = Path(__file__).parent / "src" / "sochdb" / "lib"
     
     if target_platform is None:
         target_platform = get_platform_dir()
@@ -217,7 +217,7 @@ def install_ffi_libraries(libs: dict[str, Path], target_platform: str | None = N
 
 def clean() -> None:
     """Remove all bundled binaries and libraries."""
-    pkg_base = Path(__file__).parent / "src" / "toondb"
+    pkg_base = Path(__file__).parent / "src" / "sochdb"
     
     bin_dir = pkg_base / "_bin"
     if bin_dir.exists():
@@ -243,8 +243,8 @@ def build_current(libs_only: bool = False) -> None:
     print(f"✓ Installed {len(libs)} libraries for {platform_dir}")
     
     if not libs_only:
-        # Build toondb-bulk binary
-        print("\n=== Building toondb-bulk Binary ===")
+        # Build sochdb-bulk binary
+        print("\n=== Building sochdb-bulk Binary ===")
         binary = build_binary()
         install_binary(binary)
         print(f"✓ Installed {binary.name} for {platform_dir}")
@@ -295,11 +295,11 @@ def build_all() -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Build ToonDB native binaries and FFI libraries")
+    parser = argparse.ArgumentParser(description="Build SochDB native binaries and FFI libraries")
     parser.add_argument("--all", action="store_true", help="Build for all platforms")
     parser.add_argument("--clean", action="store_true", help="Remove bundled binaries and libraries")
     parser.add_argument("--debug", action="store_true", help="Build debug instead of release")
-    parser.add_argument("--libs", action="store_true", help="Build only FFI libraries (skip toondb-bulk)")
+    parser.add_argument("--libs", action="store_true", help="Build only FFI libraries (skip sochdb-bulk)")
     
     args = parser.parse_args()
     

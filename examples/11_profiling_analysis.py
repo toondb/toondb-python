@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ToonDB HNSW Profiling Analysis and Visualization
+SochDB HNSW Profiling Analysis and Visualization
 
 This script analyzes the profiling output from end-to-end profiling and provides:
 1. Detailed breakdown of time spent in each phase
@@ -167,7 +167,7 @@ def print_detailed_report(
     dimension = meta.get('dimension', 768)
     
     print("=" * 80)
-    print("ToonDB HNSW End-to-End Profiling Analysis")
+    print("SochDB HNSW End-to-End Profiling Analysis")
     print("=" * 80)
     print()
     
@@ -377,10 +377,10 @@ def create_visualization(
 def main():
     import argparse
     
-    parser = argparse.ArgumentParser(description='Analyze ToonDB profiling data')
+    parser = argparse.ArgumentParser(description='Analyze SochDB profiling data')
     parser.add_argument('--python-profile', default='profiling_results.json',
                        help='Path to Python profiling JSON')
-    parser.add_argument('--rust-profile', default='/tmp/toondb_profile.json',
+    parser.add_argument('--rust-profile', default='/tmp/sochdb_profile.json',
                        help='Path to Rust profiling JSON')
     parser.add_argument('--output-chart', default='profiling_chart.png',
                        help='Path to output chart (requires matplotlib)')
@@ -390,7 +390,7 @@ def main():
     # Check for files
     if not os.path.exists(args.rust_profile):
         print(f"Error: Rust profile not found at {args.rust_profile}")
-        print("Run the profiling first with TOONDB_PROFILING=1")
+        print("Run the profiling first with SOCHDB_PROFILING=1")
         sys.exit(1)
     
     # Load profiles

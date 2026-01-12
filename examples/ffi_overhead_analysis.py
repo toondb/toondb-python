@@ -4,7 +4,7 @@ FFI Overhead Analysis
 
 Direct comparison of:
 1. Pure Rust insert (via profiler binary)
-2. Python FFI insert (via toondb module)
+2. Python FFI insert (via sochdb module)
 
 Goal: Identify specific sources of the 14x performance gap.
 """
@@ -14,23 +14,23 @@ import numpy as np
 import sys
 import os
 
-# Add toondb-python-sdk to path
-sdk_path = os.path.join(os.path.dirname(__file__), 'toondb-python-sdk')
+# Add sochdb-python-sdk to path
+sdk_path = os.path.join(os.path.dirname(__file__), 'sochdb-python-sdk')
 if os.path.exists(sdk_path):
     sys.path.insert(0, sdk_path)
 
 try:
-    from toondb import HnswIndex
-    TOONDB_AVAILABLE = True
+    from sochdb import HnswIndex
+    SOCHDB_AVAILABLE = True
 except ImportError as e:
-    print(f"ToonDB not available: {e}")
-    TOONDB_AVAILABLE = False
+    print(f"SochDB not available: {e}")
+    SOCHDB_AVAILABLE = False
 
 def benchmark_ffi_overhead():
     """Test various batch sizes to identify FFI bottlenecks."""
     
-    if not TOONDB_AVAILABLE:
-        print("❌ ToonDB not available - skipping FFI benchmark")
+    if not SOCHDB_AVAILABLE:
+        print("❌ SochDB not available - skipping FFI benchmark")
         return
     
     print("🔬 FFI Overhead Analysis")
@@ -116,7 +116,7 @@ def analyze_memory_patterns():
         print(f"  F-contiguous: {vectors.flags['F_CONTIGUOUS']}")
         print(f"  Owns data: {vectors.flags['OWNDATA']}")
         
-        if TOONDB_AVAILABLE and vectors.flags['C_CONTIGUOUS']:
+        if SOCHDB_AVAILABLE and vectors.flags['C_CONTIGUOUS']:
             try:
                 index = HnswIndex(dimension=dim, m=16, ef_construction=100)
                 start_time = time.perf_counter()

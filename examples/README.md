@@ -1,12 +1,12 @@
-# ToonDB Python SDK Examples
+# SochDB Python SDK Examples
 
-This directory contains practical examples demonstrating ToonDB Python SDK usage across various scenarios.
+This directory contains practical examples demonstrating SochDB Python SDK usage across various scenarios.
 
 ## Prerequisites
 
 ```bash
 # Install the SDK
-cd toondb-python-sdk
+cd sochdb-python-sdk
 pip install -e .
 
 # Build the native library (for embedded mode)
@@ -33,7 +33,7 @@ cargo build --release
 
 ```bash
 # Set the library path
-export TOONDB_LIB_PATH=/path/to/toon_database/target/release
+export SOCHDB_LIB_PATH=/path/to/toon_database/target/release
 
 # Run any example
 python examples/01_basic_operations.py
@@ -41,11 +41,11 @@ python examples/01_basic_operations.py
 
 ### IPC Mode Example (08)
 
-Requires a running ToonDB IPC server:
+Requires a running SochDB IPC server:
 
 ```bash
-# Start the server first (from toondb-storage)
-cargo run --bin ipc_server -- --socket /tmp/toondb.sock
+# Start the server first (from sochdb-storage)
+cargo run --bin ipc_server -- --socket /tmp/sochdb.sock
 
 # Then run the example
 python examples/08_ipc_client.py
@@ -73,17 +73,17 @@ examples/
 The simplest example to get started:
 
 ```python
-from toondb import Database
+from sochdb import Database
 
 # Open/create a database
 db = Database.open("./my_data")
 
 # Store data
-db.put(b"greeting", b"Hello, ToonDB!")
+db.put(b"greeting", b"Hello, SochDB!")
 
 # Retrieve data
 value = db.get(b"greeting")
-print(value)  # b"Hello, ToonDB!"
+print(value)  # b"Hello, SochDB!"
 
 # Clean up
 db.close()

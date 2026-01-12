@@ -12,7 +12,7 @@ Run with:
     python examples/09_python_triggers.py
 """
 
-from toondb.plugins import (
+from sochdb.plugins import (
     PythonPlugin,
     PluginRegistry,
     TriggerEvent,
@@ -22,7 +22,7 @@ from toondb.plugins import (
 )
 
 print("=" * 60)
-print("  ToonDB Python Plugin System - Demo")
+print("  SochDB Python Plugin System - Demo")
 print("=" * 60)
 print()
 

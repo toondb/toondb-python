@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ToonDB Python SDK - Example: Collections (Embedded FFI)
+SochDB Python SDK - Example: Collections (Embedded FFI)
 
 This example demonstrates collection operations using the embedded
 Database class (FFI). No server required!
@@ -10,11 +10,11 @@ for semantic search.
 """
 
 import json
-from toondb import Database
+from sochdb import Database
 
 def main():
     print("=" * 60)
-    print("ToonDB - Collections Example (Embedded FFI)")
+    print("SochDB - Collections Example (Embedded FFI)")
     print("=" * 60)
     print("Note: This uses embedded Database - no server required!\n")
     
@@ -118,7 +118,7 @@ def main():
     ✓ Simple deployment
     ✗ Business logic in Python (maintenance overhead)
     
-    gRPC (ToonDBClient):
+    gRPC (SochDBClient):
     ✓ All logic in Rust server (single source of truth)
     ✓ Language-agnostic API
     ✓ Temporal graphs, policies, and advanced features

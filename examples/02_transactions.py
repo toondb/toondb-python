@@ -3,7 +3,7 @@
 Example 02: Transactions
 ========================
 
-This example demonstrates transaction handling in ToonDB:
+This example demonstrates transaction handling in SochDB:
 - Beginning and committing transactions
 - Automatic commit with context managers
 - Manual abort/rollback
@@ -20,8 +20,8 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from toondb import Database, Transaction
-from toondb.errors import TransactionError, DatabaseError
+from sochdb import Database, Transaction
+from sochdb.errors import TransactionError, DatabaseError
 
 DB_PATH = "./example_02_db"
 
@@ -252,7 +252,7 @@ def example_batch_operations():
 def main():
     """Run all examples."""
     print("\n" + "=" * 60)
-    print("ToonDB Python SDK - Example 02: Transactions")
+    print("SochDB Python SDK - Example 02: Transactions")
     print("=" * 60)
     
     cleanup()

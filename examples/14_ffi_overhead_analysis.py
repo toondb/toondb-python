@@ -20,7 +20,7 @@ import numpy as np
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent / "src"))
-from toondb.vector import VectorIndex
+from sochdb.vector import VectorIndex
 
 def test_batch_vs_single_insert():
     """Test if benchmark is using single inserts instead of efficient batch."""
@@ -197,7 +197,7 @@ def test_rust_core_claim():
 
 
 def main():
-    print("ToonDB FFI Overhead Investigation")
+    print("SochDB FFI Overhead Investigation")
     print("Goal: Understand why benchmark shows 851 vec/s vs claimed 1.5K+ Rust core")
     
     try:

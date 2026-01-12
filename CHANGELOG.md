@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to the ToonDB Python SDK will be documented in this file.
+All notable changes to the SochDB Python SDK will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -15,11 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.3.2] - 2026-01-04
 
 ### Repository Update
-- 📦 **Moved Python SDK** to its own repository: [https://github.com/toondb/toondb-python-sdk](https://github.com/toondb/toondb-python-sdk)
+- 📦 **Moved Python SDK** to its own repository: [https://github.com/sochdb/sochdb-python-sdk](https://github.com/sochdb/sochdb-python-sdk)
 - This allows for independent versioning and faster CI/CD pipelines.
 
 ### Infrastructure
-- **New Release Workflow**: Now pulls pre-built binaries directly from [toondb/toondb](https://github.com/toondb/toondb) releases.
+- **New Release Workflow**: Now pulls pre-built binaries directly from [sochdb/sochdb](https://github.com/sochdb/sochdb) releases.
   - Supports Python 3.9 through 3.13
   - Automatically creates GitHub releases with all wheel packages attached
   - Each wheel bundles platform-specific binaries and FFI libraries
@@ -31,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Windows x64
 
 ### Documentation
-- Added comprehensive [RELEASE.md](RELEASE.md) explaining how binaries are sourced from toondb/toondb
+- Added comprehensive [RELEASE.md](RELEASE.md) explaining how binaries are sourced from sochdb/sochdb
 - Updated README with binary source information
 - Enhanced release workflow with detailed summaries and status reporting
 
@@ -41,15 +41,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 #### Production-Grade CLI Tools
 
-CLI commands now available globally after `pip install toondb-client`:
+CLI commands now available globally after `pip install sochdb-client`:
 
 ```bash
-toondb-server      # IPC server for multi-process access
-toondb-bulk        # High-performance vector operations
-toondb-grpc-server # gRPC server for remote vector search
+sochdb-server      # IPC server for multi-process access
+sochdb-bulk        # High-performance vector operations
+sochdb-grpc-server # gRPC server for remote vector search
 ```
 
-**toondb-server features:**
+**sochdb-server features:**
 - **Stale socket detection** - Auto-cleans orphaned socket files
 - **Health checks** - Waits for server ready before returning
 - **Graceful shutdown** - Handles SIGTERM/SIGINT/SIGHUP
@@ -57,13 +57,13 @@ toondb-grpc-server # gRPC server for remote vector search
 - **Permission checks** - Validates directory writable before starting
 - **stop/status commands** - Built-in process management
 
-**toondb-bulk features:**
+**sochdb-bulk features:**
 - **Input validation** - Checks file exists, readable, correct extension
 - **Output validation** - Checks directory writable, handles overwrites
 - **Progress reporting** - Shows file sizes during operations
 - **Structured subcommands** - build-index, query, info, convert
 
-**toondb-grpc-server features:**
+**sochdb-grpc-server features:**
 - **Port checking** - Verifies port available before binding
 - **Process detection** - Identifies what process is using a port
 - **Privileged port check** - Warns about ports < 1024 requiring root
@@ -83,9 +83,9 @@ toondb-grpc-server # gRPC server for remote vector search
 
 #### Environment Variable Overrides
 
-- `TOONDB_SERVER_PATH` - Override toondb-server binary path
-- `TOONDB_BULK_PATH` - Override toondb-bulk binary path  
-- `TOONDB_GRPC_SERVER_PATH` - Override toondb-grpc-server binary path
+- `SOCHDB_SERVER_PATH` - Override sochdb-server binary path
+- `SOCHDB_BULK_PATH` - Override sochdb-bulk binary path  
+- `SOCHDB_GRPC_SERVER_PATH` - Override sochdb-grpc-server binary path
 
 ### Changed
 
@@ -98,21 +98,21 @@ toondb-grpc-server # gRPC server for remote vector search
 ### Added
 
 #### Cross-Platform Binary Distribution
-- **Zero-compile installation**: Pre-built `toondb-bulk` binaries bundled in wheels
+- **Zero-compile installation**: Pre-built `sochdb-bulk` binaries bundled in wheels
 - **Platform support matrix**:
   - `manylinux_2_17_x86_64` - Linux x86_64 (glibc ≥ 2.17)
   - `manylinux_2_17_aarch64` - Linux ARM64 (AWS Graviton, etc.)
   - `macosx_11_0_universal2` - macOS Intel + Apple Silicon
   - `win_amd64` - Windows x64
 - **Automatic binary resolution** with fallback chain:
-  1. Bundled in wheel (`_bin/<platform>/toondb-bulk`)
-  2. System PATH (`which toondb-bulk`)
+  1. Bundled in wheel (`_bin/<platform>/sochdb-bulk`)
+  2. System PATH (`which sochdb-bulk`)
   3. Cargo target directory (development mode)
 
 #### Bulk API Enhancements
 - `bulk_query_index()` - Query HNSW indexes for k nearest neighbors
 - `bulk_info()` - Get index metadata (vector count, dimension, etc.)
-- `get_toondb_bulk_path()` - Get resolved path to toondb-bulk binary
+- `get_sochdb_bulk_path()` - Get resolved path to sochdb-bulk binary
 - `_get_platform_tag()` - Platform detection (linux-x86_64, darwin-aarch64, etc.)
 - `_find_bundled_binary()` - Uses `importlib.resources` for installed packages
 
@@ -130,7 +130,7 @@ toondb-grpc-server # gRPC server for remote vector search
 
 ### Changed
 
-- Package renamed from `toondb-client` to `toondb`
+- Package renamed from `sochdb-client` to `sochdb`
 - Wheel tags changed from `any` to platform-specific (`py3-none-<platform>`)
 - Binary resolution now uses `importlib.resources` instead of `__file__` paths
 
@@ -157,7 +157,7 @@ Follows the "uv-style" approach where:
 ### Added
 
 - Initial release
-- Embedded mode with FFI access to ToonDB
+- Embedded mode with FFI access to SochDB
 - IPC client mode for multi-process access
 - Path-native API with O(|path|) lookups
 - ACID transactions with snapshot isolation
@@ -173,6 +173,6 @@ Follows the "uv-style" approach where:
 | Method | 768D Throughput | Notes |
 |--------|-----------------|-------|
 | Python FFI | ~130 vec/s | Direct FFI calls |
-| Bulk API | ~1,600 vec/s | Subprocess to toondb-bulk |
+| Bulk API | ~1,600 vec/s | Subprocess to sochdb-bulk |
 
 FFI overhead eliminated by subprocess approach for bulk operations.

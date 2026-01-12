@@ -1,6 +1,6 @@
-# Contributing to ToonDB Python SDK
+# Contributing to SochDB Python SDK
 
-Thank you for your interest in contributing to the ToonDB Python SDK! This guide provides all the information you need to build, test, and contribute to the project.
+Thank you for your interest in contributing to the SochDB Python SDK! This guide provides all the information you need to build, test, and contribute to the project.
 
 ---
 
@@ -29,8 +29,8 @@ Thank you for your interest in contributing to the ToonDB Python SDK! This guide
 
 ```bash
 # Clone the repository
-git clone https://github.com/toondb/toondb-python-sdk.git
-cd toondb-python-sdk
+git clone https://github.com/sochdb/sochdb-python-sdk.git
+cd sochdb-python-sdk
 
 # Install in editable mode
 pip install -e .
@@ -46,7 +46,7 @@ pip install -e ".[dev]"
 ### Python SDK Only
 
 ```bash
-cd toondb-python-sdk
+cd sochdb-python-sdk
 pip install -e .
 ```
 
@@ -56,16 +56,16 @@ If you need to rebuild the native library:
 
 ```bash
 # Build Rust library
-cd toondb
-cargo build --release -p toondb-storage
+cd sochdb
+cargo build --release -p sochdb-storage
 
 # Copy to Python SDK
-cp target/release/libtoondb_storage.dylib \
-   toondb-python-sdk/src/toondb/_bin/darwin-arm64/
+cp target/release/libsochdb_storage.dylib \
+   sochdb-python-sdk/src/sochdb/_bin/darwin-arm64/
 
 # For Linux
-cp target/release/libtoondb_storage.so \
-   toondb-python-sdk/src/toondb/_bin/linux-x86_64/
+cp target/release/libsochdb_storage.so \
+   sochdb-python-sdk/src/sochdb/_bin/linux-x86_64/
 ```
 
 ---
@@ -76,22 +76,22 @@ cp target/release/libtoondb_storage.so \
 
 ```bash
 # Run Python tests
-cd toondb-python-sdk
+cd sochdb-python-sdk
 pytest tests/
 
 # Run with coverage
-pytest --cov=toondb tests/
+pytest --cov=sochdb tests/
 ```
 
 ### Integration Tests
 
 ```bash
-# Start ToonDB server first
-cd toondb
-cargo run -p toondb-grpc
+# Start SochDB server first
+cd sochdb
+cargo run -p sochdb-grpc
 
 # In another terminal, run integration tests
-cd toondb-python-sdk
+cd sochdb-python-sdk
 pytest tests/integration/
 ```
 
@@ -99,7 +99,7 @@ pytest tests/integration/
 
 ```bash
 # Test all examples
-cd toondb-python-sdk
+cd sochdb-python-sdk
 ./run_examples.sh
 
 # Test specific example
@@ -114,12 +114,12 @@ python3 examples/25_temporal_graph_embedded.py
 
 ```bash
 # Development mode
-cd toondb
-cargo run -p toondb-grpc
+cd sochdb
+cargo run -p sochdb-grpc
 
 # Production mode (optimized)
-cargo build --release -p toondb-grpc
-./target/release/toondb-grpc --host 0.0.0.0 --port 50051
+cargo build --release -p sochdb-grpc
+./target/release/sochdb-grpc --host 0.0.0.0 --port 50051
 ```
 
 ### Server Configuration
@@ -134,7 +134,7 @@ The server runs all business logic including:
 
 ### Configuration File
 
-Create `toondb-server-config.toml`:
+Create `sochdb-server-config.toml`:
 
 ```toml
 [server]
@@ -192,8 +192,8 @@ test: Add integration tests for graphs
 
 1. **Fork and Clone**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/toondb-python-sdk.git
-   cd toondb-python-sdk
+   git clone https://github.com/YOUR_USERNAME/sochdb-python-sdk.git
+   cd sochdb-python-sdk
    ```
 
 2. **Create Feature Branch**
@@ -239,12 +239,12 @@ test: Add integration tests for graphs
 │                                                            │
 │  1. EMBEDDED MODE              2. SERVER MODE             │
 │  ┌─────────────────┐          ┌─────────────────┐       │
-│  │  Database       │          │  ToonDBClient   │       │
+│  │  Database       │          │  SochDBClient   │       │
 │  │  (FFI bindings) │          │  (gRPC client)  │       │
 │  └────────┬────────┘          └────────┬────────┘       │
 │           │                             │                 │
 │           ▼                             ▼                 │
-│  libtoondb_storage.dylib      toondb-grpc server        │
+│  libsochdb_storage.dylib      sochdb-grpc server        │
 │  (Rust native library)        (Rust gRPC service)       │
 └──────────────────────────────────────────────────────────┘
 ```
@@ -259,7 +259,7 @@ test: Add integration tests for graphs
 - Collection management
 
 **grpc_client.py** (630 lines)
-- `ToonDBClient` class for gRPC
+- `SochDBClient` class for gRPC
 - All server-based operations
 - Connection management
 - Error handling
@@ -292,16 +292,16 @@ test: Add integration tests for graphs
 **New in 0.3.4:**
 ```python
 # NEW: Temporal graphs in embedded mode
-from toondb import Database
+from sochdb import Database
 
 db = Database.open("./mydb")
 db.add_temporal_edge(...)
 db.query_temporal_graph(...)
 
 # NEW: Same temporal graph API in server mode
-from toondb import ToonDBClient
+from sochdb import SochDBClient
 
-client = ToonDBClient("localhost:50051")
+client = SochDBClient("localhost:50051")
 client.add_temporal_edge(...)
 client.query_temporal_graph(...)
 ```
@@ -310,7 +310,7 @@ client.query_temporal_graph(...)
 
 **Old Code:**
 ```python
-from toondb import Database, GraphOverlay
+from sochdb import Database, GraphOverlay
 
 db = Database.open("./data")
 graph = GraphOverlay(db)
@@ -319,16 +319,16 @@ graph.add_node("alice", "person", {"name": "Alice"})
 
 **New Code (Server Mode):**
 ```python
-from toondb import ToonDBClient
+from sochdb import SochDBClient
 
-# Start server first: cargo run -p toondb-grpc
-client = ToonDBClient("localhost:50051")
+# Start server first: cargo run -p sochdb-grpc
+client = SochDBClient("localhost:50051")
 client.add_node("alice", "person", {"name": "Alice"})
 ```
 
 **New Code (Embedded Mode):**
 ```python
-from toondb import Database
+from sochdb import Database
 
 db = Database.open("./data")
 # GraphOverlay is now built into Database
@@ -336,8 +336,8 @@ db.add_node("alice", "person", {"name": "Alice"})
 ```
 
 **Key Changes:**
-1. `GraphOverlay` removed - features merged into `Database` and `ToonDBClient`
-2. Server mode requires running `toondb-grpc` server
+1. `GraphOverlay` removed - features merged into `Database` and `SochDBClient`
+2. Server mode requires running `sochdb-grpc` server
 3. Embedded mode uses direct FFI bindings (faster, no network)
 4. Same API for both modes
 
@@ -352,7 +352,7 @@ db.add_node("alice", "person", {"name": "Alice"})
 vim setup.py
 
 # Update version in __init__.py
-vim src/toondb/__init__.py
+vim src/sochdb/__init__.py
 
 # Update CHANGELOG.md
 vim CHANGELOG.md
@@ -397,13 +397,13 @@ Before submitting a PR, ensure:
 
 ## Getting Help
 
-- **Main Repo**: https://github.com/toondb/toondb
-- **Python SDK Issues**: https://github.com/toondb/toondb-python-sdk/issues
-- **Discussions**: https://github.com/toondb/toondb/discussions
-- **Contributing Guide**: See main repo [CONTRIBUTING.md](https://github.com/toondb/toondb/blob/main/CONTRIBUTING.md)
+- **Main Repo**: https://github.com/sochdb/sochdb
+- **Python SDK Issues**: https://github.com/sochdb/sochdb-python-sdk/issues
+- **Discussions**: https://github.com/sochdb/sochdb/discussions
+- **Contributing Guide**: See main repo [CONTRIBUTING.md](https://github.com/sochdb/sochdb/blob/main/CONTRIBUTING.md)
 
 ---
 
 ## License
 
-By contributing to ToonDB Python SDK, you agree that your contributions will be licensed under the Apache License 2.0.
+By contributing to SochDB Python SDK, you agree that your contributions will be licensed under the Apache License 2.0.

@@ -7,7 +7,7 @@ import time
 from pathlib import Path
 
 sys.path.append(str(Path(__file__).parent.parent / "src"))
-from toondb.vector import VectorIndex
+from sochdb.vector import VectorIndex
 
 def test_exact_benchmark_config():
     print("=" * 80)
@@ -99,14 +99,14 @@ def compare_with_chromadb():
     print("CHROMADB COMPARISON")
     print("=" * 80)
     
-    toondb_perf = test_exact_benchmark_config()
+    sochdb_perf = test_exact_benchmark_config()
     chromadb_perf = 14303  # From user's benchmark
     
-    gap = chromadb_perf / toondb_perf if toondb_perf > 0 else float('inf')
+    gap = chromadb_perf / sochdb_perf if sochdb_perf > 0 else float('inf')
     
     print(f"\n📊 PERFORMANCE GAP ANALYSIS:")
     print(f"   ChromaDB:  {chromadb_perf:,} vec/s")
-    print(f"   ToonDB:    {toondb_perf:,.0f} vec/s")
+    print(f"   SochDB:    {sochdb_perf:,.0f} vec/s")
     print(f"   Gap:       {gap:.1f}x slower")
     print()
     
@@ -117,11 +117,11 @@ def compare_with_chromadb():
     else:
         print(f"   🔍 Significant gap - needs investigation")
     
-    return toondb_perf, chromadb_perf
+    return sochdb_perf, chromadb_perf
 
 if __name__ == '__main__':
     try:
-        toondb_perf, chromadb_perf = compare_with_chromadb()
+        sochdb_perf, chromadb_perf = compare_with_chromadb()
         
     except Exception as e:
         print(f"Error: {e}")

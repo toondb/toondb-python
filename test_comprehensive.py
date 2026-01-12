@@ -7,7 +7,7 @@ Tests all features mentioned in the README
 import sys
 import shutil
 from pathlib import Path
-from toondb import Database, IpcClient
+from sochdb import Database, IpcClient
 
 test_count = 0
 pass_count = 0
@@ -177,7 +177,7 @@ def main():
     if test_dir.exists():
         shutil.rmtree(test_dir)
     
-    print("🧪 ToonDB Python SDK Comprehensive Feature Test\n")
+    print("🧪 SochDB Python SDK Comprehensive Feature Test\n")
     print("Testing all features mentioned in README...\n")
     print("=" * 60)
     

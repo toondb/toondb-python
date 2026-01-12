@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ToonDB Python SDK - Example: Batch Operations (Embedded FFI)
+SochDB Python SDK - Example: Batch Operations (Embedded FFI)
 
 Atomic batch operations ensure all-or-nothing semantics.
 If any operation fails, the entire batch is rolled back.
@@ -8,11 +8,11 @@ If any operation fails, the entire batch is rolled back.
 No server required - uses embedded FFI.
 """
 
-from toondb import Database
+from sochdb import Database
 
 def main():
     print("=" * 60)
-    print("ToonDB - Batch Operations Example (Embedded FFI)")
+    print("SochDB - Batch Operations Example (Embedded FFI)")
     print("=" * 60)
     print("Note: This uses embedded Database - no server required!\n")
     

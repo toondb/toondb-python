@@ -7,7 +7,7 @@ Run this if you don't have the Rust IPC server available.
 import os, socket, struct, threading, sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', 'src'))
-from toondb.ipc_client import OpCode, Message
+from sochdb.ipc_client import OpCode, Message
 
 class MockServer:
     def __init__(self, socket_path: str):
@@ -69,7 +69,7 @@ class MockServer:
             os.remove(self.socket_path)
 
 if __name__ == "__main__":
-    server = MockServer("/tmp/toondb.sock")
+    server = MockServer("/tmp/sochdb.sock")
     try:
         server.start()
     except KeyboardInterrupt:

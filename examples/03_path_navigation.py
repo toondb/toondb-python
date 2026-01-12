@@ -3,7 +3,7 @@
 Example 03: Path Navigation
 ===========================
 
-This example demonstrates ToonDB's path-native API for hierarchical data:
+This example demonstrates SochDB's path-native API for hierarchical data:
 - Storing data at paths (like a filesystem)
 - Retrieving data by path
 - Organizing data hierarchically
@@ -20,8 +20,8 @@ import json
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from toondb import Database
-from toondb.errors import DatabaseError
+from sochdb import Database
+from sochdb.errors import DatabaseError
 
 DB_PATH = "./example_03_db"
 
@@ -274,7 +274,7 @@ def example_path_with_transactions():
 def main():
     """Run all examples."""
     print("\n" + "=" * 60)
-    print("ToonDB Python SDK - Example 03: Path Navigation")
+    print("SochDB Python SDK - Example 03: Path Navigation")
     print("=" * 60)
     
     cleanup()

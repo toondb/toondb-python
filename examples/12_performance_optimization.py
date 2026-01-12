@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ToonDB Performance Optimization Test
+SochDB Performance Optimization Test
 
 This script tests different ef_construction values to find the optimal
 balance between insert speed and recall quality.
@@ -20,10 +20,10 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parent.parent / "src"))
 
 try:
-    from toondb.vector import VectorIndex
+    from sochdb.vector import VectorIndex
 except ImportError:
     print("Error: Could not import VectorIndex")
-    print("Make sure TOONDB_LIB_PATH is set to the compiled library")
+    print("Make sure SOCHDB_LIB_PATH is set to the compiled library")
     sys.exit(1)
 
 
@@ -38,7 +38,7 @@ def test_performance_vs_quality(
     results = []
     
     print("=" * 80)
-    print("ToonDB Performance vs Quality Optimization")
+    print("SochDB Performance vs Quality Optimization")
     print("=" * 80)
     print(f"Testing ef_construction values: {ef_values}")
     print(f"Vectors: {num_test_vectors}, Dimension: {vectors.shape[1]}")

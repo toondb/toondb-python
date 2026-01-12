@@ -3,18 +3,18 @@ requires = ["setuptools>=45", "wheel", "setuptools-rust>=1.7"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "toondb-client"
-version = "0.3.4"
-description = "ToonDB is an AI-native database with token-optimized output, O(|path|) lookups, built-in vector search, and durable transactions."
+name = "sochdb-client"
+version = "0.4.0"
+description = "SochDB is an AI-native database with token-optimized output, O(|path|) lookups, built-in vector search, and durable transactions."
 readme = "README.md"
 license = {text = "Apache-2.0"}
 authors = [
-    {name = "Sushanth", email = "sushanth@toondb.dev"}
+    {name = "Sushanth", email = "sushanth@sochdb.dev"}
 ]
 maintainers = [
-    {name = "Sushanth", email = "sushanth@toondb.dev"}
+    {name = "Sushanth", email = "sushanth@sochdb.dev"}
 ]
-keywords = ["database", "llm", "ai", "vector-search", "embedded", "key-value", "toondb", "context-retrieval", "transactions"]
+keywords = ["database", "llm", "ai", "vector-search", "embedded", "key-value", "sochdb", "context-retrieval", "transactions"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -55,23 +55,23 @@ all = [
 ]
 
 [project.urls]
-Homepage = "https://toondb.dev"
-Repository = "https://github.com/toondb/toondb-python-sdk"
-Documentation = "https://docs.toondb.dev"
-"Bug Tracker" = "https://github.com/toondb/toondb-python-sdk/issues"
+Homepage = "https://sochdb.dev"
+Repository = "https://github.com/sochdb/sochdb-python-sdk"
+Documentation = "https://sochdb.dev"
+"Bug Tracker" = "https://github.com/sochdb/sochdb-python-sdk/issues"
 
 [project.scripts]
 # CLI tools accessible from anywhere after pip install
-toondb-server = "toondb.cli_server:main"
-toondb-bulk = "toondb.cli_bulk:main"
-toondb-grpc-server = "toondb.cli_grpc:main"
+sochdb-server = "sochdb.cli_server:main"
+sochdb-bulk = "sochdb.cli_bulk:main"
+sochdb-grpc-server = "sochdb.cli_grpc:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.setuptools.package-data]
 # Include bundled native libraries for each platform
-toondb = [
+sochdb = [
     # Shared libraries (FFI) - platform-specific directories
     "lib/*/*.so",
     "lib/*/*.dylib", 
@@ -81,8 +81,8 @@ toondb = [
     "lib/*.dylib",
     "lib/*.dll",
     # Bundled CLI binaries (bulk operations)
-    "_bin/**/toondb-bulk",
-    "_bin/**/toondb-bulk.exe",
+    "_bin/**/sochdb-bulk",
+    "_bin/**/sochdb-bulk.exe",
     "_bin/**/*",
 ]
 
@@ -115,7 +115,7 @@ skip = "*-win32 *-manylinux_i686 pp* *-musllinux*"
 before-build = "bash {project}/scripts/build_rust_binary.sh"
 
 # Test the wheel after building
-test-command = "python -c \"from toondb.bulk import get_toondb_bulk_path; print(get_toondb_bulk_path())\""
+test-command = "python -c \"from sochdb.bulk import get_sochdb_bulk_path; print(get_sochdb_bulk_path())\""
 
 [tool.cibuildwheel.linux]
 # Use manylinux_2_17 for broad glibc compatibility (glibc >= 2.17)
