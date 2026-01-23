@@ -47,6 +47,24 @@ from .namespace import (
 )
 from .vector import VectorIndex
 
+# Queue API (v0.4.3)
+from .queue import (
+    PriorityQueue,
+    QueueConfig,
+    QueueKey,
+    Task,
+    TaskState,
+    QueueStats,
+    StreamingTopK,
+    create_queue,
+    # Backend interfaces for custom implementations
+    QueueBackend,
+    QueueTransaction,
+    FFIQueueBackend,
+    GrpcQueueBackend,
+    InMemoryQueueBackend,
+)
+
 # Server mode (gRPC/IPC)
 from .grpc_client import SochDBClient, SearchResult, Document, GraphNode, GraphEdge, TemporalEdge
 from .ipc_client import IpcClient
@@ -97,6 +115,21 @@ __all__ = [
     "SearchRequest",
     "SearchResults",
     "VectorIndex",
+    
+    # Queue API (v0.4.3)
+    "PriorityQueue",
+    "QueueConfig",
+    "QueueKey",
+    "Task",
+    "TaskState",
+    "QueueStats",
+    "StreamingTopK",
+    "create_queue",
+    "QueueBackend",
+    "QueueTransaction",
+    "FFIQueueBackend",
+    "GrpcQueueBackend",
+    "InMemoryQueueBackend",
     
     # Server mode (thin clients)
     "SochDBClient",
