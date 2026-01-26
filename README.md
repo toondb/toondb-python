@@ -38,7 +38,7 @@ Choose the deployment mode that fits your needs.
 - ✅ Edge deployments without network
 - ✅ No server setup required
 
-**Embedded Concurrent Mode (NEW in v0.4.8):**
+**Embedded Concurrent Mode (NEW in v0.4.9):**
 - ✅ Web applications (Flask, FastAPI, Django)
 - ✅ Multi-process workers (Gunicorn, uWSGI)
 - ✅ Hot reloading development servers
@@ -54,7 +54,7 @@ Choose the deployment mode that fits your needs.
 
 ---
 
-## Concurrent Embedded Mode (v0.4.8+)
+## Concurrent Embedded Mode (v0.4.9+)
 
 For web applications that need multiple processes to access the same database:
 
@@ -104,6 +104,246 @@ def update_user(user_id):
 | Read (multi-process) | **Blocked** ❌ | ~100ns ✅ |
 | Write | ~5ms (fsync) | ~60µs (amortized) |
 | Max concurrent readers | 1 | 1024 |
+
+### Gunicorn Deployment
+
+```bash
+# Install Gunicorn
+pip install gunicorn
+
+# Run with 4 worker processes (all can access same DB concurrently)
+gunicorn -w 4 -b 0.0.0.0:8000 app:app
+
+# Workers automatically share the database in concurrent mode
+```
+
+### uWSGI Deployment
+
+```bash
+# Install uWSGI
+pip install uwsgi
+
+# Run with 4 processes
+uwsgi --http :8000 --wsgi-file app.py --callable app --processes 4
+```
+
+### Systemd Service Example
+
+```ini
+# /etc/systemd/system/myapp.service
+[Unit]
+Description=MyApp with SochDB
+After=network.target
+
+[Service]
+Type=notify
+User=appuser
+WorkingDirectory=/opt/myapp
+ExecStart=/opt/myapp/venv/bin/gunicorn -w 4 -b 0.0.0.0:8000 app:app
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+
+```bash
+# Enable and start service
+sudo systemctl enable myapp
+sudo systemctl start myapp
+sudo systemctl status myapp
+```
+
+### Docker Compose Example
+
+```yaml
+version: '3.8'
+services:
+  app:
+    build: .
+    environment:
+      - WORKERS=4
+    volumes:
+      - ./data:/app/data  # Shared database volume
+    ports:
+      - "8000:8000"
+    command: gunicorn -w 4 -b 0.0.0.0:8000 app:app
+```
+
+---
+
+## System Requirements
+
+### For Concurrent Mode
+
+- **SochDB Core**: v0.4.4 or later
+- **Python**: 3.9+ (3.11+ recommended)
+- **Native Library**: `libsochdb_storage.{dylib,so}` v0.4.4+
+- **FFI**: ctypes (built-in to Python)
+
+**Operating Systems:**
+- ✅ Linux (Ubuntu 20.04+, RHEL 8+)
+- ✅ macOS (10.15+, both Intel and Apple Silicon)
+- ⚠️  Windows (requires native builds)
+
+**File Descriptors:**
+- Default limit: 1024 (sufficient for most workloads)
+- For high concurrency with Gunicorn: `ulimit -n 4096`
+
+**Memory:**
+- Standard mode: ~50MB base + data
+- Concurrent mode: +4KB per concurrent reader slot (1024 slots = ~4MB overhead)
+- Gunicorn: Each worker has independent memory
+
+---
+
+## Troubleshooting
+
+### "Database is locked" Error (Standard Mode)
+
+```
+OperationalError: database is locked
+```
+
+**Solution**: Use concurrent mode for multi-process access:
+
+```python
+# ❌ Standard mode - Gunicorn workers will conflict
+db = Database.open("./data.db")
+
+# ✅ Concurrent mode - all workers can access
+db = Database.open_concurrent("./data.db")
+```
+
+### Library Not Found Error
+
+```
+OSError: libsochdb_storage.dylib not found
+```
+
+**macOS**:
+```bash
+# Build and install library
+cd /path/to/sochdb
+cargo build --release
+sudo cp target/release/libsochdb_storage.dylib /usr/local/lib/
+```
+
+**Linux**:
+```bash
+cd /path/to/sochdb
+cargo build --release
+sudo cp target/release/libsochdb_storage.so /usr/local/lib/
+sudo ldconfig
+```
+
+**Development Mode** (no install):
+```bash
+export DYLD_LIBRARY_PATH=/path/to/sochdb/target/release  # macOS
+export LD_LIBRARY_PATH=/path/to/sochdb/target/release    # Linux
+```
+
+### Gunicorn Worker Issues
+
+**Symptom**: Workers crash with "database locked"
+
+**Solution 1** - Ensure concurrent mode is used:
+```python
+# app.py
+import os
+from sochdb import Database
+
+# Use environment variable to control mode
+USE_CONCURRENT = os.getenv('USE_CONCURRENT_MODE', 'true').lower() == 'true'
+
+if USE_CONCURRENT:
+    db = Database.open_concurrent('./db')
+else:
+    db = Database.open('./db')
+
+print(f"Concurrent mode: {db.is_concurrent}")  # Should be True
+```
+
+```bash
+# Start with concurrent mode enabled
+USE_CONCURRENT_MODE=true gunicorn -w 4 -b 0.0.0.0:8000 app:app
+```
+
+**Solution 2** - Check preload settings:
+```bash
+# Don't use --preload with concurrent mode
+# ❌ This will cause issues:
+gunicorn --preload -w 4 app:app
+
+# ✅ Let each worker open the database:
+gunicorn -w 4 app:app
+```
+
+### FastAPI with Uvicorn Workers
+
+**Symptom**: `RuntimeError: Concurrent mode requires multi-process access`
+
+**Solution**: Use Uvicorn workers correctly:
+```bash
+# ❌ Single worker (async) - doesn't need concurrent mode
+uvicorn app:app --workers 1
+
+# ✅ Multiple workers - needs concurrent mode
+uvicorn app:app --workers 4
+```
+
+```python
+# main.py
+from fastapi import FastAPI
+from sochdb import Database
+import multiprocessing
+
+app = FastAPI()
+
+# Detect if running in multi-worker mode
+workers = multiprocessing.cpu_count()
+if workers > 1:
+    db = Database.open_concurrent("./db")
+else:
+    db = Database.open("./db")
+```
+
+### Performance Issues
+
+**Symptom**: Concurrent reads slower than expected
+
+**Check 1** - Verify concurrent mode is active:
+```python
+import logging
+logging.basicConfig(level=logging.INFO)
+
+db = Database.open_concurrent("./db")
+if not db.is_concurrent:
+    logging.error("Database is not in concurrent mode!")
+    raise RuntimeError("Expected concurrent mode")
+logging.info(f"Concurrent mode active: {db.is_concurrent}")
+```
+
+**Check 2** - Monitor worker processes:
+```bash
+# Watch Gunicorn workers
+watch -n 1 'ps aux | grep gunicorn'
+
+# Monitor file descriptors
+lsof | grep libsochdb_storage
+```
+
+**Check 3** - Batch writes:
+```python
+# ❌ Slow - individual writes with fsync
+for item in items:
+    db.put(key, value)
+
+# ✅ Fast - batch in transaction
+tx = db.begin_txn()
+for item in items:
+    tx.put(key, value)
+tx.commit()  # Single fsync for entire batch
+```
 
 ---
 
