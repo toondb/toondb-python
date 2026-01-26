@@ -46,8 +46,8 @@ def _check_safe_mode() -> bool:
     return False
 
 
-def _get_platform_dir() -> str:
-    """Get the platform directory name for the current system."""
+def _get_platform_candidates() -> List[str]:
+    """Get list of potential platform directory names."""
     import platform as plat
     system = plat.system().lower()
     machine = plat.machine().lower()
@@ -57,8 +57,28 @@ def _get_platform_dir() -> str:
         machine = "x86_64"
     elif machine in ("arm64", "aarch64"):
         machine = "aarch64"
+        
+    candidates = []
     
-    return f"{system}-{machine}"
+    # 1. Existing format: system-machine (e.g., darwin-aarch64)
+    candidates.append(f"{system}-{machine}")
+    
+    # 2. Rust target triples (Standard naming)
+    if system == "darwin":
+        if machine == "aarch64":
+            candidates.append("aarch64-apple-darwin")
+        elif machine == "x86_64":
+            candidates.append("x86_64-apple-darwin")
+    elif system == "linux":
+        if machine == "x86_64":
+            candidates.append("x86_64-unknown-linux-gnu")
+        elif machine == "aarch64":
+            candidates.append("aarch64-unknown-linux-gnu")
+    elif system == "windows":
+        if machine == "x86_64":
+            candidates.append("x86_64-pc-windows-msvc")
+            
+    return candidates
 
 
 def _find_library():
@@ -80,7 +100,7 @@ def _find_library():
         lib_name = "libsochdb_index.so"
     
     pkg_dir = os.path.dirname(__file__)
-    platform_dir = _get_platform_dir()
+    platform_candidates = _get_platform_candidates()
     
     # 1. Environment variable override
     env_path = os.environ.get("SOCHDB_LIB_PATH")
@@ -93,23 +113,32 @@ def _find_library():
             return full_path
     
     # Search paths in priority order
-    search_paths = [
-        # 2. Bundled library in wheel (platform-specific)
-        os.path.join(pkg_dir, "lib", platform_dir),
-        # 3. Bundled library in wheel (generic)
-        os.path.join(pkg_dir, "lib"),
-        # 4. Package directory
-        pkg_dir,
-        # 5. Development builds
-        os.path.join(pkg_dir, "..", "..", "..", "target", "release"),
-        os.path.join(pkg_dir, "..", "..", "..", "target", "debug"),
-        # 6. System paths (no manual setup required)
+    search_paths = []
+    
+    # 2. Bundled library in wheel (platform-specific candidates)
+    for platform_dir in platform_candidates:
+        search_paths.append(os.path.join(pkg_dir, "lib", platform_dir))
+        # Also check local _bin for dev/other builds if structured that way
+        search_paths.append(os.path.join(pkg_dir, "_bin", platform_dir))
+        
+    # 3. Bundled library in wheel (generic)
+    search_paths.append(os.path.join(pkg_dir, "lib"))
+    
+    # 4. Package directory
+    search_paths.append(pkg_dir)
+    
+    # 5. Development builds
+    search_paths.append(os.path.join(pkg_dir, "..", "..", "..", "target", "release"))
+    search_paths.append(os.path.join(pkg_dir, "..", "..", "..", "target", "debug"))
+    
+    # 6. System paths (no manual setup required)
+    search_paths.extend([
         "/usr/local/lib",
         "/usr/lib",
         "/opt/homebrew/lib",  # macOS Apple Silicon Homebrew
         "/opt/local/lib",      # MacPorts
         os.path.expanduser("~/.sochdb/lib"),  # User installation
-    ]
+    ])
     
     for path in search_paths:
         full_path = os.path.join(path, lib_name)
