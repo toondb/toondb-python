@@ -5,6 +5,22 @@
 **Dual-mode architecture: Embedded (FFI) + Server (gRPC/IPC)**  
 Choose the deployment mode that fits your needs.
 
+---
+
+## Installation
+
+```bash
+pip install sochdb
+```
+
+Or from source:
+```bash
+cd sochdb-python-sdk
+pip install -e .
+```
+
+---
+
 ## Architecture: Flexible Deployment
 
 ```
@@ -346,18 +362,6 @@ tx.commit()  # Single fsync for entire batch
 ```
 
 ---
-
-## Installation
-
-```bash
-pip install sochdb
-```
-
-Or from source:
-```bash
-cd sochdb-python-sdk
-pip install -e .
-```
 
 # SochDB Python SDK Documentation
 
