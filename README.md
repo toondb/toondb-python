@@ -38,7 +38,7 @@ Choose the deployment mode that fits your needs.
 - ✅ Edge deployments without network
 - ✅ No server setup required
 
-**Embedded Concurrent Mode (NEW in v0.4.9):**
+**Embedded Concurrent Mode:**
 - ✅ Web applications (Flask, FastAPI, Django)
 - ✅ Multi-process workers (Gunicorn, uWSGI)
 - ✅ Hot reloading development servers
@@ -54,7 +54,7 @@ Choose the deployment mode that fits your needs.
 
 ---
 
-## Concurrent Embedded Mode (v0.4.9+)
+## Concurrent Embedded Mode
 
 For web applications that need multiple processes to access the same database:
 
@@ -175,9 +175,9 @@ services:
 
 ### For Concurrent Mode
 
-- **SochDB Core**: v0.4.4 or later
+- **SochDB Core**: Latest version
 - **Python**: 3.9+ (3.11+ recommended)
-- **Native Library**: `libsochdb_storage.{dylib,so}` v0.4.4+
+- **Native Library**: `libsochdb_storage.{dylib,so}`
 - **FFI**: ctypes (built-in to Python)
 
 **Operating Systems:**
@@ -4347,7 +4347,7 @@ A:
 A: Yes! Both modes have the same API. Change `Database.open()` to `SochDBClient()` and vice versa.
 
 **Q: Do temporal graphs work in embedded mode?**  
-A: Yes! As of v0.3.4, temporal graphs work in both embedded and server modes with identical APIs.
+A: Yes! Temporal graphs work in both embedded and server modes with identical APIs.
 
 **Q: Is embedded mode slower than server mode?**  
 A: Embedded mode is faster for single-process use (no network overhead). Server mode is better for distributed deployments.
